@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    </head>
+    <body>
+        <div id="app">
+            <v-app>
+                <v-app>
+                    <div>
+                        <!-- Bars/App bars の v-app-bar -->
+                        <v-app-bar color="blue" dark app clipped-left>
+                            <v-app-bar-nav-icon @click="drawer=!drawer"></v-app-bar-nav-icon>
+                            <v-toolbar-title>Den3 Developers</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                            <v-avatar class="justify-center">
+                                <img src="https://cdn.vuetifyjs.com/images/john.jpg">
+                            </v-avatar>
+                        </v-app-bar>
+
+                        <!-- 色付きドロワー -->
+                        <v-navigation-drawer
+                                app
+                                v-model="drawer"
+                                clipped
+                                class="gray"
+                                dark>
+                            <v-list>
+                                <v-list-item
+                                        v-for="item in items"
+                                        :key="item.title"
+                                        :to="item.to"
+                                        link
+                                >
+                                    <v-list-item-icon>
+                                        <v-icon>{{ item.icon }}</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-navigation-drawer>
+
+                    </div>
+                    <v-content>
+                        <v-container>
+                            <div>
+                                <router-view></router-view>
+                            </div>
+                        </v-container>
+                    </v-content>
+                </v-app>
+            </v-app>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+        <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+        <script src="https://unpkg.com/http-vue-loader"></script>
+        <script>
+        
+        const Account = { template: `
+                    <div>
+                        <v-card>
+                            <v-card-title>
+                                <v-col cols="6">
+                                    プロフィール編集
+                                </v-col>
+                            </v-card-title>
+                        <v-card-text>
+                        
+                        <v-flex class="mb-4 justify=center">
+                        <v-avatar size="96" class="mr-4">
+                            <img src="https://cdn.vuetifyjs.com/images/john.jpg">
+                        </v-avatar>
+                        <v-btn @click="openAvatarPicker">Change Avatar</v-btn>
+                        </v-flex>
+                        
+                        <p>メールアドレス</p>
+                        <v-text-field label="メールアドレス"></v-text-field>
+                        
+                        <p>ニックネーム</p>
+                        <v-text-field label="ニックネーム"></v-text-field>
+                        
+                        <p>学年(半角数字のみ)</p>
+                        <v-text-field label="学年"></v-text-field>
+                        
+                        <p>学部</p>
+                        <v-text-field label="学部"></v-text-field>
+                        
+                        <p>学科</p>
+                        <v-text-field label="学科"></v-text-field>
+
+                        <p>学科</p>
+                        <v-text-field label="学科"></v-text-field>
+
+                        <p>本名</p>
+                        <v-text-field label="本名"></v-text-field>
+                        
+                        <p>旧パスワード</p>
+                        <v-text-field label="旧パスワード"></v-text-field>
+                        
+                        <p>新パスワード</p>
+                        <v-text-field label="新パスワード"></v-text-field>
+                        
+
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              depressed
+                              color="primary"
+                            >
+                            更新
+                            </v-btn>
+                        </v-card-actions>
+                        </v-card>
+                    </div>
+            ` }
+        const Services = { template: `
+                <div>
+                    <v-card>
+                        <v-card-title>
+                            <v-row>
+                                <v-col cols="6">
+                                    
+                                </v-col>
+                            </v-row>
+                        </v-card-title>
+                    <v-card>
+                </div>
+            `}
+            const router = new VueRouter({
+	            routes : [
+		            {path:'/account', component : Account},
+	            	{path:'/services',component: Services}
+	            ]
+            })
+            new Vue({
+                components: {
+                    AccountPage: httpVueLoader('module/account.vue')
+                },
+                name: 'App',
+                el: '#app',
+                vuetify: new Vuetify(),
+                data: function () {
+                    return {
+                        name: '',
+                        email: '',
+                        dialog: false,
+                        drawer: null,
+                        items: [
+                            { title: 'Account', icon: 'mdi-account-box', to: "/account"},
+                            { title: 'Service', icon: 'mdi-gavel', to: "/services" },
+                        ],
+                    };
+                },
+                methods: {
+                    login: function () {
+                        alert(this.mail+" "+this.pass);
+                    }
+                },
+                router
+            })
+        </script>
+    </body>
+</html>

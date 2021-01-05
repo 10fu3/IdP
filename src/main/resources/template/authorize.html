@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+        <meta name="client_id" th:content="${client_id}">
+        <style>
+            [v-cloak] {
+              display: none;
+            }
+        </style>
+          
+    </head>
+        <body>
+    <div id="app">
+        <v-app>
+            <v-row justify="center" align-content="center">
+                <v-col>
+                    <v-card width="450px" class="mx-auto mt-5" elevation="12">
+                        <v-card-title class="justify-center">
+                            <v-img src="http://den3.net/wp-content/themes/den3HP/set/image/logo.png"></v-img>
+                        </v-card-title>
+                        <v-card-text>
+                            <v-col class="ml-5">
+                                <v-layout justify="center"align-content="center">
+                                    <v-avatar size="110">
+                                        <img v-bind:src="service_icon">
+                                    </v-avatar>
+                                    <v-img justify="center" class="ml-12 mt-12 mr-12" max-height="30" max-width="30" src="https://cdn0.iconfinder.com/data/icons/feather/96/591276-arrow-right-512.png"></v-img>
+                                    <v-avatar size="110">
+                                        <img v-bind:src="user_icon">
+                                    </v-avatar>
+                                </v-layout>
+                            </v-col>
+                            <h1 class="font-weight-light" align="center">
+                               {{ service_name }} が
+                            </h1>
+                            <h3 align="center">
+                                あなたのアカウントへアクセスを要求しています
+                            </h3>
+                            <p class="font-weight-light" align="center">
+                                {{ user_name }}としてサインイン中
+                            </p>
+                            <v-divider></v-divider>
+                            <p class="font-weight-light mt-3" align="center">
+                               説明: {{ service_description }}
+                            </p>
+                            <p class="font-weight-light" align="center">
+                                {{ service_name }}は次の権限を要求しています
+                            </p>
+
+                            <v-list-item v-for="perm in perms">
+                                <v-list-item-content>
+                                    <v-list-item-title> ･ {{ perm }}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        <v-divider></v-divider>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-btn block color="info" @click="login">ログイン</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: function () {
+                return {
+                    client_id: "",
+                    service_name: "",
+                    service_icon: "",
+                    service_description: "",
+                    user_icon: "",
+                    user_name: "",
+                    redirect: "",
+                    perms: []
+                };
+            },
+            created: function () {
+                if(localStorage.getItem("authorization") === null){
+                    location.href = "/login?redirect="+encodeURI(location.href);
+                }
+
+                let token_response = fetch('http://localhost/api/v1/account/token', { 
+                        method: 'get',
+                        headers: new Headers({
+                            'Authorization': localStorage.getItem('authorization'), 
+                        })
+                    });
+                    token_response.then(r=>{
+                        if(r.ok){
+
+                            fetch('http://localhost/api/v1/account/profile', { 
+                                method: 'get',
+                                headers: new Headers({
+                                    'Authorization': localStorage.getItem('authorization'), 
+                                }),
+                            }).then(d=>d.json()).then(profile=>{
+                                this.user_icon = profile.icon;
+                                this.user_name = profile.nick;
+                            });
+
+                            this.client_id = document.getElementsByName('client_id')[0].getAttribute('content');
+                            fetch('http://localhost/api/v1/service/', { 
+                                 method: 'get',
+                                 headers: new Headers({
+                                    'client_id': this.client_id
+                                })
+                            }).then(d=>d.json()).then(service_json=>{
+                                this.service_name = service_json.service_name;
+                                this.service_icon = service_json.service_icon;
+                                this.service_description = service_json.service_description;
+                                service_json.service_permissions.forEach(e=>{
+                                    switch (e) {
+                                        case "read_uuid":
+                                            this.perms.push("あなたを識別します");
+                                            break;
+                                        case "edit_uuid":
+                                            this.perms.push("識別するためのIDを編集します");
+                                            break;
+                                        case "read_mail":
+                                            this.perms.push("あなたのメールアドレスを読み取ります");
+                                            break;
+                                        case "edit_mail":
+                                            this.perms.push("登録されたメールアドレスを編集します");
+                                            break;
+                                        case "read_profile":
+                                            this.perms.push("あなたのプロフィールを読み取ります");
+                                            break;
+                                        case "edit_profile":
+                                            this.perms.push("あなたのプロフィールを編集します");
+                                            break;
+                                        case "read_last_login_time":
+                                            this.perms.push("最後にログインした時刻を読み取ります");
+                                            break;
+                                        case "delete_self_account":
+                                            this.perms.push("あなたのアカウントを削除します");
+                                            break;
+                                    }
+                                });
+                            })
+                        }else{
+                            location.href = "/login?redirect="+encodeURI(location.href);
+                        }
+                    });
+                
+            },
+            methods: {
+                login: function () {
+                    fetch(location.href, { 
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=UTF-8',
+                            'Authorization': localStorage.getItem('authorization'), 
+                        },
+                    }).then(d=>d.json()).then(j=>{
+                        location.href = j.redirect;
+                    }).catch(e=>{
+                        alert("エラー");
+                    });
+                }
+            }
+        })
+      </script>
+    </body>
+</html>

@@ -1,0 +1,43 @@
+version: '3'
+services:
+  app:
+    image: idpinjar:latest
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+      - redis
+    #必ず本番環境ではDBのパスワードは変更すること
+    environment:
+      D3A_DBACCOUNT: ""
+      D3A_DBPASSWORD: ""
+      D3A_ISDOCKER: "DOCKER"
+      D3A_MAIL_ADDRESS: ""
+      D3A_MAIL_PASS: ""
+      D3A_SELF_URL: "http://localhost"
+      D3A_LOGIN_URL: "http://localhost/login"
+      D3A_JWT_SECRET: ""
+    command: java -jar target/IdP-1.0-all.jar
+  db:
+    image: mariadb:latest
+    #必ず本番環境ではDBのパスワードは変更すること
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: den3_account
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    volumes:
+      - mariadb:/var/lib/mysql
+      - ./initdb
+    ports:
+      - "3306:3306"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+volumes: # ← Volumesでデータ領域をコンテナとして定義
+  mariadb:
+    driver: local
