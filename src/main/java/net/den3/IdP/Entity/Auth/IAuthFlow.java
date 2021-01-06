@@ -32,10 +32,10 @@ public interface IAuthFlow {
     String getUUID();
 
     /**
-     * 認可コードから得られるアクセストークンを取得するためのアクセストークンエンティティの内部ID
-     * @return アクセストークンエンティティの内部ID
+     * 認可コードと紐付けされたアクセストークン
+     * @return アクセストークン
      */
-    String getAccessTokenUUID();
+    String getAccessToken();
 
     /**
      * PKCE用 コードチャレンジの方法を返す s256,plane,other
