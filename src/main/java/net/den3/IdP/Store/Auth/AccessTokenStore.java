@@ -57,14 +57,13 @@ public class AccessTokenStore implements IAccessTokenStore {
         }
         return db.getLineBySQL(fieldName, (con) -> {
             try {
-                PreparedStatement ps = con.prepareStatement("SELECT * FROM access_token_store WHERE ? = ?");
-                ps.setString(1, targetField);
-                ps.setString(2, targetValue);
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM access_token_store WHERE "+targetField+" = ?");;
+                ps.setString(1, targetValue);
                 return Optional.of(ps);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+                return Optional.empty();
             }
-            return Optional.empty();
         }).map(p -> p.stream().map(line -> {
                     AccessTokenBuilder builder = AccessTokenBuilder
                             .New()
@@ -125,7 +124,7 @@ public class AccessTokenStore implements IAccessTokenStore {
     public void deleteTokenByID(String id) {
         db.controlSQL((con)->{
             try {
-                PreparedStatement ps = con.prepareStatement("DELETE FROM access_token_store where = ?");
+                PreparedStatement ps = con.prepareStatement("DELETE FROM access_token_store where uuid = ?");
                 ps.setString(1,id);
                 return Optional.of(Collections.singletonList(ps));
             } catch (SQLException ex) {
