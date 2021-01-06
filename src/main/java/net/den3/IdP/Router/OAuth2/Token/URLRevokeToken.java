@@ -35,6 +35,11 @@ public class URLRevokeToken {
             return;
         }
 
+        if(!token.get().getClientID().equalsIgnoreCase(service.get().getServiceID())){
+            ctx.status(StatusCode.NotFound.code()).result("bad token");
+            return;
+        }
+
         //削除
         IAccessTokenStore.getInstance().deleteTokenByID(token.get().getUUID());
         IAuthFlowStore.getInstance().getAuthFlowByAccessToken(token.get().getAccessToken());
