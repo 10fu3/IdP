@@ -179,7 +179,7 @@ public class AuthFlowStore implements IAuthFlowStore{
     public void deleteAuthFlow(String id) {
         db.controlSQL((con)->{
             try {
-                PreparedStatement ps = con.prepareStatement("DELETE FROM auth_flow where = ?");
+                PreparedStatement ps = con.prepareStatement("DELETE FROM auth_flow where uuid = ?");
                 ps.setString(1,id);
                 return Optional.of(Collections.singletonList(ps));
             } catch (SQLException ex) {
