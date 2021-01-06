@@ -52,7 +52,7 @@ public class URLCreateToken {
             if(!opAccount.isPresent()){
                 ctx.status(StatusCode.NotFound.code());
                 //削除
-                IAuthFlowStore.getInstance().deleteAuthFlow(auth.getClientID());
+                IAuthFlowStore.getInstance().deleteAuthFlow(auth.getUUID());
                 IAccessTokenStore.getInstance().deleteTokenByID(token.get().getUUID());
                 return;
             }
@@ -75,7 +75,7 @@ public class URLCreateToken {
             if(auth.getLifeTime() < (System.currentTimeMillis()/1000L)){
                 ctx.status(StatusCode.BadRequest.code()).result("timeout");
                 //削除
-                IAuthFlowStore.getInstance().deleteAuthFlow(auth.getClientID());
+                IAuthFlowStore.getInstance().deleteAuthFlow(auth.getUUID());
             }
 
             CodeChallengeMethod challengeMethod = auth.getCodeChallengeMethod().orElse(CodeChallengeMethod.NONE);
@@ -130,8 +130,10 @@ public class URLCreateToken {
             }
             ctx.json(builder.build());
 
-            //一度使った認可コードは削除する
-            IAuthFlowStore.getInstance().deleteAuthFlow(auth.getClientID());
+            //削除
+            IAuthFlowStore.getInstance().deleteAuthFlow(auth.getUUID());
+        }else{
+            ctx.status(StatusCode.BadRequest.code());
         }
     }
 }
