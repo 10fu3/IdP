@@ -11,6 +11,7 @@ import net.den3.IdP.Util.StatusCode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class URLUpdateToken {
     public static void mainFlow(io.javalin.http.Context ctx){
@@ -65,11 +66,15 @@ public class URLUpdateToken {
 
             IAccessToken newToken = AccessTokenBuilder
                     .New()
+                    .setUUID(token.getUUID())
                     .setAccountID(token.getAccountID())
                     .setClientID(token.getClientID())
+                    .setAccessToken(UUID.randomUUID().toString())
                     .setNonce(token.getNonce())
                     .setScope(token.getScope())
                     .build();
+
+            IAccessTokenStore.getInstance().updateToken(newToken);
 
             ctx.status(StatusCode.OK.code())
                 .json(MapBuilder
@@ -80,7 +85,6 @@ public class URLUpdateToken {
                      .put("refresh_token",newToken.getRefreshToken())
                      .put("expires_in",IAccessToken._30DAY)
                      .build());
-
 
         }else{
             ctx.status(StatusCode.BadRequest.code());
