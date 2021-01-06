@@ -69,8 +69,8 @@ public class AuthFlowStore implements IAuthFlowStore{
                 return Optional.of(ps);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+                return Optional.empty();
             }
-            return Optional.empty();
         }).map(p -> p.stream().map(line -> {
                     AuthFlowBuilder builder = AuthFlowBuilder
                             .create()
