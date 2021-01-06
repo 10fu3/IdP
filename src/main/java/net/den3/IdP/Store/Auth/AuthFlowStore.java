@@ -100,8 +100,8 @@ public class AuthFlowStore implements IAuthFlowStore{
     }
 
     /**
-     * アクセストークンから認可フローエンティティを取得する
-     * @param token アクセストークン
+     * 認可コードから認可フローエンティティを取得する
+     * @param token 認可コード
      * @return 認可フローエンティティ
      */
     @Override
@@ -110,8 +110,8 @@ public class AuthFlowStore implements IAuthFlowStore{
     }
 
     /**
-     * リフレッシュトークンから認可フローエンティティを取得する
-     * @param token リフレッシュトークン
+     * アクセストークンから認可フローエンティティを取得する
+     * @param token アクセストークン
      * @return 認可フローエンティティ
      */
     @Override
@@ -120,8 +120,8 @@ public class AuthFlowStore implements IAuthFlowStore{
     }
 
     /**
-     * 認可コードから認可フローエンティティを取得する
-     * @param token 認可コード
+     * リフレッシュトークンから認可フローエンティティを取得する
+     * @param token リフレッシュトークン
      * @return 認可フローエンティティ
      */
     @Override
