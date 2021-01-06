@@ -31,15 +31,14 @@ public class URLCreateToken {
             Optional<IService> opService = IServiceStore.getInstance().getService(ctx.formParam("client_id"));
             Optional<IAuthFlow> opAuthFlow = IAuthFlowStore.getInstance().getAuthFlowByAuthorizationCode(ctx.formParam("code"));
 
-            if(!opService.isPresent() || !opAuthFlow.isPresent()){
-                ctx.status(StatusCode.NotFound.code());
+            if(!(opService.isPresent() && opAuthFlow.isPresent())){
+                ctx.status(StatusCode.NotFound.code()).result("params_not_found");
                 return;
             }
-
-            Optional<IAccessToken> token = IAccessTokenStore.getInstance().getTokenByToken(opAuthFlow.get().getAccessTokenUUID());
+            Optional<IAccessToken> token = IAccessTokenStore.getInstance().getTokenByToken(opAuthFlow.get().getAccessToken());
 
             if(!token.isPresent()){
-                ctx.status(StatusCode.NotFound.code());
+                ctx.status(StatusCode.NotFound.code()).result("access_token");
                 return;
             }
 
