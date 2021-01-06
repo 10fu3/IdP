@@ -62,9 +62,10 @@ public class AuthFlowStore implements IAuthFlowStore{
         }
         return db.getLineBySQL(fieldName, (con) -> {
             try {
-                PreparedStatement ps = con.prepareStatement("SELECT * FROM auth_flow WHERE ? = ?");
-                ps.setString(1, targetField);
-                ps.setString(2, targetValue);
+                //SQL文を組み立てている
+                //文字列結合: SQL Injectionを考慮する必要があるが,限られた列名しかアクセスされないため利用する
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM auth_flow WHERE "+targetField+" = ?");
+                ps.setString(1, targetValue);
                 return Optional.of(ps);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
