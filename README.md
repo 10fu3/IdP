@@ -38,6 +38,7 @@
 ## REST API
 
 ## 設計方針
+- Nullが存在しない
 - すべての処理はURLTaskを起点に処理が始まる
 - データを扱う最小の単位はすべてEntity
 - すべてのEntityはEntity固有のIDを持つ
