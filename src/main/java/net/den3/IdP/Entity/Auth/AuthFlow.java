@@ -16,7 +16,7 @@ class AuthFlow implements IAuthFlow {
     String accountID = "";
     String authorizationCode = UUID.randomUUID().toString();
     String uuid = UUID.randomUUID().toString();
-    String accessTokenUUID = "";
+    String accessToken = "";
     Optional<String> codeChallenge = Optional.empty();
     Optional<CodeChallengeMethod> codeChallengeMethod = Optional.empty();
 
@@ -67,8 +67,8 @@ class AuthFlow implements IAuthFlow {
      * @return アクセストークンエンティティの内部ID
      */
     @Override
-    public String getAccessTokenUUID() {
-        return this.accessTokenUUID;
+    public String getAccessToken() {
+        return this.accessToken;
     }
 
 
