@@ -1,4 +1,4 @@
-package net.den3.IdP.Router.OAuth2;
+package net.den3.IdP.Router.OAuth2.Token;
 
 import net.den3.IdP.Entity.Auth.AccessTokenBuilder;
 import net.den3.IdP.Entity.Auth.IAccessToken;

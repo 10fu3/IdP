@@ -1,4 +1,4 @@
-package net.den3.IdP.Router.OAuth2;
+package net.den3.IdP.Router.OAuth2.Token;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import net.den3.IdP.Config;
@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class URLTokenVerify {
+public class URLVerifyToken {
     public static void mainFlow(io.javalin.http.Context ctx){
         //必須
         String idToken = Optional.ofNullable(ctx.formParam("id_token")).orElse("");

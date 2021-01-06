@@ -1,12 +1,13 @@
-package net.den3.IdP.Router.OAuth2;
+package net.den3.IdP.Router.OAuth2.Token;
 
+import net.den3.IdP.Router.OAuth2.URLCreateToken;
 import net.den3.IdP.Util.StatusCode;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class URLToken {
+public class URLTokenRouter {
     public static void mainFlow(io.javalin.http.Context ctx){
         Map<String, List<String>> param = ctx.formParamMap();
         if(param.containsKey("grant_type")){
