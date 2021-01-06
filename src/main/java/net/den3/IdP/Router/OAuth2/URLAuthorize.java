@@ -88,7 +88,7 @@ public class URLAuthorize {
 
             AuthFlowBuilder authBuilder = AuthFlowBuilder
                     .create()
-                    .setAccessTokenUUID(accessToken)
+                    .setAccessToken(accessToken)
                     .setClientID(service.getServiceID())
                     .setAccountID(account.get().getUUID())
                     .setLifeTimeNow();
