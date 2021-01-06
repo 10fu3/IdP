@@ -5,6 +5,7 @@ import net.den3.IdP.Config;
 import net.den3.IdP.Entity.Service.IService;
 import net.den3.IdP.Security.JWTVerify;
 import net.den3.IdP.Store.Service.IServiceStore;
+import net.den3.IdP.Util.Base64Util;
 import net.den3.IdP.Util.ContentsType;
 import net.den3.IdP.Util.MapBuilder;
 import net.den3.IdP.Util.StatusCode;
@@ -37,7 +38,7 @@ public class URLTokenVerify {
         MapBuilder builder = MapBuilder.New().put("error","invalid_request");
         opService.ifPresent(service -> {
             AtomicReference<Boolean> valid = new AtomicReference<>(true);
-            Optional<DecodedJWT> opJwt = JWTVerify.check(idToken, service.getSecretID(), clientID);
+            Optional<DecodedJWT> opJwt = JWTVerify.check(idToken, service.getSecretID(), Config.get().getSelfURL());
             if(!opJwt.isPresent()){
                 builder.put("error_description","Invalid IdToken.");
                 valid.set(false);
@@ -56,7 +57,7 @@ public class URLTokenVerify {
                     }
                 });
                 //有効期限切れ
-                if(jwt.getExpiresAt().after(new Date())){
+                if((jwt.getExpiresAt().getTime()-new Date().getTime()) < 0){
                     builder.put("error_description","IdToken expired.");
                     valid.set(false);
                     return;
@@ -74,7 +75,7 @@ public class URLTokenVerify {
                 }
             });
             if(valid.get() && opJwt.isPresent()){
-                ctx.contentType(ContentsType.JSON.get()).result(opJwt.get().getPayload());
+                ctx.contentType(ContentsType.JSON.get()).result(Base64Util.decodeString(opJwt.get().getPayload()));
             }else{
                 ctx.json(builder.build());
             }
