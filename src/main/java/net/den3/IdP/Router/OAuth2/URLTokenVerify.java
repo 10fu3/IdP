@@ -7,6 +7,7 @@ import net.den3.IdP.Security.JWTVerify;
 import net.den3.IdP.Store.Service.IServiceStore;
 import net.den3.IdP.Util.ContentsType;
 import net.den3.IdP.Util.MapBuilder;
+import net.den3.IdP.Util.StatusCode;
 
 import java.util.Date;
 import java.util.Optional;
@@ -18,11 +19,20 @@ public class URLTokenVerify {
         String idToken = Optional.ofNullable(ctx.formParam("id_token")).orElse("");
         String clientID = Optional.ofNullable(ctx.formParam("client_id")).orElse("");
 
+        if(idToken.isEmpty() || clientID.isEmpty()){
+            ctx.status(StatusCode.BadRequest.code());
+            return;
+        }
+
         //任意
         Optional<String> opNonce = Optional.ofNullable(ctx.formParam("nonce"));
         Optional<String> opAccountID = Optional.ofNullable(ctx.formParam("user_id"));
 
         Optional<IService> opService = IServiceStore.getInstance().getService(clientID);
+        if(!opService.isPresent()){
+            ctx.status(StatusCode.NotFound.code());
+            return;
+        }
 
         MapBuilder builder = MapBuilder.New().put("error","invalid_request");
         opService.ifPresent(service -> {
