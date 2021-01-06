@@ -33,7 +33,8 @@ public class URLGetProfile {
                     .New()
                     .put("user_id",opAccount.get().getUUID())
                     .put("nick",opAccount.get().getNickName())
-                    .put("icon",opAccount.get().getIconURL()));
+                    .put("icon",opAccount.get().getIconURL())
+                    .build());
 
         }else{
             Optional<String> accountUUID = ILoginTokenStore.getInstance().getAccountUUID(authorization);
