@@ -46,11 +46,11 @@ public class AuthFlowBuilder {
         return this;
     }
 
-    public AuthFlowBuilder setAccessTokenUUID(String uuid){
+    public AuthFlowBuilder setAccessToken(String uuid){
         if(uuid == null){
             throw new NullPointerException();
         }
-        this.af.accessTokenUUID = uuid;
+        this.af.accessToken = uuid;
         return this;
     }
 
