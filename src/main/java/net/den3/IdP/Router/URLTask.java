@@ -2,6 +2,9 @@ package net.den3.IdP.Router;
 
 import net.den3.IdP.Router.Account.*;
 import net.den3.IdP.Router.OAuth2.*;
+import net.den3.IdP.Router.OAuth2.Token.URLRevokeToken;
+import net.den3.IdP.Router.OAuth2.Token.URLTokenRouter;
+import net.den3.IdP.Router.OAuth2.Token.URLVerifyToken;
 import net.den3.IdP.Router.Service.URLCreateService;
 import net.den3.IdP.Router.Service.URLDeleteService;
 import net.den3.IdP.Router.Service.URLGetService;
@@ -41,8 +44,9 @@ public class URLTask {
         webApp.routes(()-> path("/oauth2/v1",()->{
             get("/authorize", URLAuthorizePage::mainFlow);
             post("/authorize", URLAuthorize::mainFlow);
-            post("/token", URLToken::mainFlow);
-            post("/verify",URLTokenVerify::mainFlow);
+            post("/token", URLTokenRouter::mainFlow);
+            post("/verify", URLVerifyToken::mainFlow);
+            post("/revoke", URLRevokeToken::mainFlow);
         }));
         webApp.get("/login", URLLoginPage::mainFlow);
         webApp.get("/account/register/goal/:key",URLConfirmedEntry::mainFlow);
