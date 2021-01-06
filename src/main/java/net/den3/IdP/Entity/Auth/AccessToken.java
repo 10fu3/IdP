@@ -9,7 +9,7 @@ class AccessToken implements IAccessToken{
     String accountID = "";
     String scope = "";
     Optional<String> nonce = Optional.empty();
-    String accessToken = UUID.randomUUID().toString();
+    String accessToken;
     String refreshToken = UUID.randomUUID().toString();
     Long lifeTimeAccessToken = (System.currentTimeMillis()/1000L) + _30DAY;
     Long lifeTimeRefreshToken = (System.currentTimeMillis()/1000L) + _90DAY;
@@ -46,7 +46,7 @@ class AccessToken implements IAccessToken{
      */
     @Override
     public String getAccessToken() {
-        return this.refreshToken;
+        return this.accessToken;
     }
 
     /**
