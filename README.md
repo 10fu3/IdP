@@ -6,6 +6,7 @@
 - pom.ymlのあるディレクトリまで移動する
 -   "maven clean package"を実行
 -   "docker build -t IdP ."を実行
+- docker-compose.ymlに必要なパラメーターを記述する
 -   "docker-compose up" を実行
 
 ## 使用技術
