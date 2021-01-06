@@ -37,6 +37,11 @@
 
 ## REST API
 
+https://api.line.me の部分がlocalhostやグローバルIPになる以外下のページに準拠しています
+
+https://developers.line.biz/ja/reference/line-login/#issue-access-token
+
+
 ## 設計方針
 - Nullが存在しない
 - すべての処理はURLTaskを起点に処理が始まる
