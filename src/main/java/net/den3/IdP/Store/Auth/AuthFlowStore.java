@@ -8,10 +8,7 @@ import net.den3.IdP.Store.InjectionStore;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AuthFlowStore implements IAuthFlowStore{
@@ -80,7 +77,7 @@ public class AuthFlowStore implements IAuthFlowStore{
                             .setAccountID(line.get("account_id"))
                             .setAuthorizationCode("authorization_code")
                             .setClientID(line.get("client_id"))
-                            .setAccessTokenUUID(line.get("access_token_uuid"))
+                            .setAccessToken(line.get("access_token_uuid"))
                             .setCodeChallengeMethod(CodeChallengeMethod.of(line.get("code_challenge_method")))
                             .setLifeTime(Long.parseLong(line.get("lifetime")));
                     if(!line.get("code_challenge_method").isEmpty()){
@@ -161,7 +158,7 @@ public class AuthFlowStore implements IAuthFlowStore{
                 ps.setString(1,flow.getAuthorizationCode());
                 ps.setString(2,flow.getAccountID());
                 ps.setString(3,flow.getClientID());
-                ps.setString(4,flow.getAccessTokenUUID());
+                ps.setString(4,flow.getAccessToken());
                 ps.setString(5,flow.getCodeChallengeMethod().orElse(CodeChallengeMethod.NONE).data);
                 ps.setString(6,flow.getCodeChallenge().orElse(""));
                 ps.setString(7,String.valueOf(flow.getLifeTime()));
@@ -204,7 +201,7 @@ public class AuthFlowStore implements IAuthFlowStore{
                 ps.setString(2,flow.getAuthorizationCode());
                 ps.setString(3,flow.getAccountID());
                 ps.setString(4,flow.getClientID());
-                ps.setString(5,flow.getAccessTokenUUID());
+                ps.setString(5,flow.getAccessToken());
                 ps.setString(6,flow.getCodeChallengeMethod().orElse(CodeChallengeMethod.NONE).data);
                 ps.setString(7,flow.getCodeChallenge().orElse(""));
                 ps.setString(8,String.valueOf(flow.getLifeTime()));
