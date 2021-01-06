@@ -1,9 +1,6 @@
 package net.den3.IdP.Entity.Account;
 
 
-import java.time.Instant;
-import java.util.UUID;
-
 public class AccountBuilder {
 
     private Account account = new Account();
@@ -90,25 +87,5 @@ public class AccountBuilder {
     public AccountBuilder setNickName(String nickName) {
         account.nickName = nickName;
         return this;
-    }
-
-    public static IAccount generate(){
-        Account account = new Account();
-        account.uuid = UUID.randomUUID().toString();
-        account.lastLogin = Instant.now().getEpochSecond();
-        account.iconURL = "https://i.imgur.com/R6tktJ6.jpg";//ただの人
-        account.nickName = "First time";
-        return account;
-    }
-
-    public static IAccount clone(IAccount clone){
-        Account account = new Account();
-        account.uuid = account.getUUID();
-        account.lastLogin = account.getLastLoginTime();
-        account.mail = account.getMail();
-        account.passwordHash = account.getPasswordHash();
-        account.iconURL = account.getIconURL();
-        account.nickName = account.getNickName();
-        return account;
     }
 }
