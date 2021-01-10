@@ -134,6 +134,20 @@ public class AccessTokenStore implements IAccessTokenStore {
         });
     }
 
+    @Override
+    public void deleteTokenByAccountUUID(String uuid) {
+        db.controlSQL((con)->{
+            try {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM access_token_store where account_id = ?");
+                ps.setString(1,uuid);
+                return Optional.of(Collections.singletonList(ps));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return Optional.empty();
+            }
+        });
+    }
+
     /**
      * 保存されているアクセストークンを更新する
      *

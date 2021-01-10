@@ -53,6 +53,12 @@ public interface IAuthFlowStore {
     void deleteAuthFlow(String id);
 
     /**
+     * DBから削除する
+     * @param id アカウントUUID
+     */
+    void deleteAuthFlowByAccountUUID(String id);
+
+    /**
      * DBに追加する
      * @param flow 認可フローエンティティ
      */

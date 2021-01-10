@@ -190,6 +190,25 @@ public class AuthFlowStore implements IAuthFlowStore{
     }
 
     /**
+     * DBから削除する
+     *
+     * @param id アカウントUUID
+     */
+    @Override
+    public void deleteAuthFlowByAccountUUID(String id) {
+        db.controlSQL((con)->{
+            try {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM auth_flow where account_id = ?");
+                ps.setString(1,id);
+                return Optional.of(Collections.singletonList(ps));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return Optional.empty();
+            }
+        });
+    }
+
+    /**
      * DBに追加する
      * @param flow 認可フローエンティティ
      */

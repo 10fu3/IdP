@@ -39,6 +39,12 @@ public interface IAccessTokenStore {
     void deleteTokenByID(String id);
 
     /**
+     * 特定のアカウントUUIDを持つアクセストークンエンティティをIdPから削除する
+     * @param uuid アカウントUUID
+     */
+    void deleteTokenByAccountUUID(String uuid);
+
+    /**
      * 保存されているアクセストークンを更新する
      * @param token 更新後のアクセストークンエンティティ
      */
