@@ -37,4 +37,10 @@ public interface IAccount {
      */
     Long getLastLoginTime();
 
+    /**
+     * アカウントの属性を取得する
+     * @return 属性
+     */
+    AccountAttribute getAttribute();
+
 }

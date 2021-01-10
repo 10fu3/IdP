@@ -1,6 +1,8 @@
 package net.den3.IdP.Entity.Account;
 
 
+import net.den3.IdP.Security.HashGenerator;
+
 public class AccountBuilder {
 
     private Account account = new Account();
@@ -70,6 +72,16 @@ public class AccountBuilder {
     }
 
     /**
+     * アカウントエンティティにパスワードを割り当てる 実際にはパスワードハッシュを生成して割り当てる
+     * @param pass パスワード(生)
+     * @return アカウントエンティティ
+     */
+    public AccountBuilder setSecurePass(String pass, String salt) {
+        account.passwordHash = HashGenerator.getSafetyPassword(pass,salt);
+        return this;
+    }
+
+    /**
      * アカウントエンティティにアイコンの保存先URLを設定する
      * @param iconURL アイコンの保存先URL
      * @return アカウントエンティティ
@@ -86,6 +98,25 @@ public class AccountBuilder {
      */
     public AccountBuilder setNickName(String nickName) {
         account.nickName = nickName;
+        return this;
+    }
+
+    /**
+     * アカウントエンティティに属性を設定する
+     * @param attribute 属性エンティティ
+     * @return ビルダー
+     */
+    public AccountBuilder setAttribute(AccountAttribute attribute){
+        account.attribute = attribute;
+        return this;
+    }
+
+    /**
+     * アカウントエンティティに空の属性を設定する
+     * @return ビルダー
+     */
+    public AccountBuilder setAttribute(){
+        account.attribute = new AccountAttribute(false,false);
         return this;
     }
 }

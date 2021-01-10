@@ -14,6 +14,7 @@ class Account implements IAccount{
     String passwordHash = "";
     String iconURL = "https://i.imgur.com/R6tktJ6.jpg";
     String nickName = "";
+    AccountAttribute attribute;
 
     /**
      * アカウントのメールアドレスを返す
@@ -69,4 +70,13 @@ class Account implements IAccount{
         return this.uuid;
     }
 
+    /**
+     * アカウントの属性を取得する
+     *
+     * @return 属性
+     */
+    @Override
+    public AccountAttribute getAttribute() {
+        return this.attribute;
+    }
 }
