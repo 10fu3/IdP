@@ -1,6 +1,7 @@
 package net.den3.IdP.Router;
 
 import net.den3.IdP.Router.Account.*;
+import net.den3.IdP.Router.Account.API.*;
 import net.den3.IdP.Router.OAuth2.*;
 import net.den3.IdP.Router.OAuth2.Token.URLRevokeToken;
 import net.den3.IdP.Router.OAuth2.Token.URLTokenRouter;
@@ -23,10 +24,20 @@ public class URLTask {
 
         webApp.routes(()-> path("/api/v1",()->{
             path("/account",()->{
-                get("/profile", URLGetProfile::mainFlow);
+                //C
+                post("/",URLEntryAccount::mainFlow);
                 post("/entry", URLEntryAccount::mainFlow);
-                post("/login",URLLogin::mainFlow);
-                post("/logout",URLLogout::mainFlow);
+                //U
+                put("/",URLUpdateProfile::mainFlow);
+                put("/profile",URLUpdateProfile::mainFlow);
+                //R
+                get("/", URLGetProfile::mainFlow);
+                get("/profile", URLGetProfile::mainFlow);
+                //D
+                delete("/",URLDeleteAccount::mainFlow);
+
+                post("/login", URLLogin::mainFlow);
+                post("/logout", URLLogout::mainFlow);
                 get("/token", URLLoginTokenLive::mainFlow);
             });
             path("/service",()->{
