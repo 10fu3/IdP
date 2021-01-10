@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * アクセストークンとリフレッシュトークン(とIDトークン)を発行する
+ */
 public class URLCreateToken {
     public static void mainFlow(io.javalin.http.Context ctx){
         Map<String, List<String>> param = ctx.formParamMap();

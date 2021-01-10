@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * トークンルーター
+ */
 public class URLTokenRouter {
     public static void mainFlow(io.javalin.http.Context ctx){
         Map<String, List<String>> param = ctx.formParamMap();

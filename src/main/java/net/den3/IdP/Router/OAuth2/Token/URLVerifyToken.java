@@ -14,6 +14,9 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * IDトークンを検証する
+ */
 public class URLVerifyToken {
     public static void mainFlow(io.javalin.http.Context ctx){
         //必須

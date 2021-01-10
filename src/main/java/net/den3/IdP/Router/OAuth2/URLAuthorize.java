@@ -17,6 +17,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+/**
+ * 認可コードを発行する
+ */
 public class URLAuthorize {
 
     //openid email profile

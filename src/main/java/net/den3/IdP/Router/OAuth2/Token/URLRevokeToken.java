@@ -9,6 +9,9 @@ import net.den3.IdP.Util.StatusCode;
 
 import java.util.Optional;
 
+/**
+ * アクセストークンを取り消す
+ */
 public class URLRevokeToken {
     public static void mainFlow(io.javalin.http.Context ctx){
 

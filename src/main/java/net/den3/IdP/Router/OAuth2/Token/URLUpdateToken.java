@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * リフレッシュトークンを用いてアクセストークンをアップデートする
+ */
 public class URLUpdateToken {
     public static void mainFlow(io.javalin.http.Context ctx){
 
