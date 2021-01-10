@@ -6,7 +6,7 @@
         <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-        <meta name="apiserver" th:content="${apiserver}">
+        <meta name="api_server" th:content="${api_server}">
         <meta name="redirect" th:content="${redirect}">
         <style>
             [v-cloak] {
@@ -98,11 +98,11 @@
                 };
             },
             created: function () {
-                this.apiserver = document.getElementsByName('apiserver')[0].getAttribute('content');
+                this.apiserver = document.getElementsByName('api_server')[0].getAttribute('content');
                 this.redirect = document.getElementsByName('redirect')[0].getAttribute('content');
 
                 if(localStorage.getItem('authorization')){
-                    let response = fetch('http://localhost/api/v1/account/token', { 
+                    let response = fetch(this.apiserver+'/api/v1/account/token', {
                         method: 'get',
                         headers: new Headers({
                             'Authorization': localStorage.getItem('authorization'), 
@@ -111,7 +111,7 @@
                     response.then(r=>{
                         if(r.ok){
                             this.isSSO = true;
-                            fetch('http://localhost/api/v1/account/profile', { 
+                            fetch(this.apiserver+'/api/v1/account/profile', {
                                 method: 'get',
                                 headers: new Headers({
                                     'Authorization': localStorage.getItem('authorization'), 
@@ -128,7 +128,7 @@
                 login: function () {
                     if(!this.isSSO){
 
-                        fetch('http://localhost/api/v1/account/login', { 
+                        fetch(this.apiserver+'/api/v1/account/login', {
                             method: 'post',
                             headers: {
                                 'Content-Type': 'text/plain;charset=UTF-8'
