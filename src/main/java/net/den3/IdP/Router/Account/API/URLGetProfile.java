@@ -1,4 +1,4 @@
-package net.den3.IdP.Router.Account;
+package net.den3.IdP.Router.Account.API;
 
 import net.den3.IdP.Entity.Account.IAccount;
 import net.den3.IdP.Entity.Auth.IAccessToken;
