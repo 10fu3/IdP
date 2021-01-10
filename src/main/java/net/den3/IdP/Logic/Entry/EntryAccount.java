@@ -22,12 +22,12 @@ public class EntryAccount {
     /**
      * 仮登録申請されたアカウントの情報をチェックを依頼し,可能なら仮登録処理まで行う
      * @param reqJSON 仮登録申請時に送られてくるJSON
-     * @param store 仮アカウントストア
-     * @param accountStore アカウントストア
-     * @param config サーバー設定情報
      * @return クライアントに返されるJSON statusが成功/失敗を表し messageがエラーの原因を返す
      */
-    public static Map<String,Object> mainFlow(Map<String,String> reqJSON,ITempAccountStore store,IAccountStore accountStore,Config config){
+    public static Map<String,Object> mainFlow(Map<String,String> reqJSON){
+
+        Config config = Config.get();
+
         //JSONからメール/パスワード/ニックネームを拾う
         String mail =reqJSON.get("mail");
         String pass = reqJSON.get("pass");
@@ -39,10 +39,8 @@ public class EntryAccount {
         //メール送信オブジェクト
         MailSendService mailService = new MailSendService(config.getEntryMailAddress(),config.getEntryMailPassword(),fromName);
 
-        System.out.println(config.getEntryMailAddress()+" "+config.getEntryMailPassword());
-
         //基準に満たない/ルール違反をしているメールアドレス/パスワードか調べる
-        CheckAccountResult checkAccountResult = EntryAccount.checkAccount(accountStore,mail, pass,nickname);
+        CheckAccountResult checkAccountResult = EntryAccount.checkAccount(mail, pass,nickname);
 
         //チェックにひっかかるアカウント情報ならばここで弾く
         if(checkAccountResult != CheckAccountResult.SUCCESS){
@@ -54,9 +52,9 @@ public class EntryAccount {
         }
 
         //すでに仮登録されていたら上書きする
-        Optional<ITempAccount> sameAccount = store.getAccountByMail(mail);
+        Optional<ITempAccount> sameAccount = ITempAccountStore.getInstance().getAccountByMail(mail);
         //ここでDBから削除する
-        sameAccount.ifPresent(account -> store.removeAccountInTemporaryDB(account.getKey()));
+        sameAccount.ifPresent(account -> ITempAccountStore.getInstance().removeAccountInTemporaryDB(account.getKey()));
 
         //<-- ここまでで基準に満たないアカウント登録はすべて却下されている -->
         //管理に使う一時的なキーを発行
@@ -76,7 +74,7 @@ public class EntryAccount {
 //        ITempAccount tempAccount = TemporaryAccountEntity.create(mail,pass,String.valueOf(TimeUnit.SECONDS.convert(System.nanoTime(), TimeUnit.NANOSECONDS)),queueID);
 //        tempAccount.setNickName(nickname);
         //仮登録テーブルに登録する
-        if(!store.addAccountInTemporaryDB(tempAccount)){
+        if(!ITempAccountStore.getInstance().addAccountInTemporaryDB(tempAccount)){
             return MapBuilder.New()
                     .put("status","ERROR")
                     .put("message","Internal Error")
@@ -97,10 +95,44 @@ public class EntryAccount {
                 ()->{
                     //失敗したとき
                     System.out.println("メール送信失敗");
-                    store.removeAccountInTemporaryDB(queueID);
+                    ITempAccountStore.getInstance().removeAccountInTemporaryDB(queueID);
                 }
         );
         return MapBuilder.New().put("status","success").build();
+    }
+
+    public static CheckAccountResult checkNickName(String nickname){
+        if(StringChecker.containsNotAllowCharacter(nickname)){
+            return CheckAccountResult.ERROR_NOT_ALLOW_CHAR;
+        }
+        return CheckAccountResult.SUCCESS;
+    }
+
+    public static CheckAccountResult checkMail(String mail){
+        if(!StringChecker.isMailAddress(mail)){
+            //Invalid e-address
+            return CheckAccountResult.ERROR_MAIL;
+        }
+        if(StringChecker.containsNotAllowCharacter(mail)){
+            return CheckAccountResult.ERROR_NOT_ALLOW_CHAR;
+        }
+        if(IAccountStore.getInstance().containsAccountInSQLByMail(mail)){
+            //Already registered e-address
+            return CheckAccountResult.ERROR_SAME;
+        }
+        //SUCCESS
+        return CheckAccountResult.SUCCESS;
+    }
+
+    public static CheckAccountResult checkPass(String pass){
+        if(pass.length() < 7){
+            //Need 8 characters or more
+            return CheckAccountResult.ERROR_PASSWORD_LENGTH;
+        }
+        if(StringChecker.containsNotAllowCharacter(pass)){
+            return CheckAccountResult.ERROR_NOT_ALLOW_CHAR;
+        }
+        return CheckAccountResult.SUCCESS;
     }
 
     /**
@@ -109,22 +141,22 @@ public class EntryAccount {
      * @param pass 登録申請用パスワード
      * @return CheckAccountResult列挙体
      */
-    public static CheckAccountResult checkAccount (IAccountStore store, String mail, String pass,String nickname){
-        if(!StringChecker.isMailAddress(mail)){
-            //Invalid e-address
-            return CheckAccountResult.ERROR_MAIL;
+    public static CheckAccountResult checkAccount (String mail, String pass,String nickname){
+
+        CheckAccountResult checkMail = checkMail(mail);
+        CheckAccountResult checkPass = checkPass(pass);
+        CheckAccountResult checkNick = checkNickName(nickname);
+
+        if(checkMail !=  CheckAccountResult.SUCCESS){
+            return checkMail;
         }
-        if(StringChecker.containsNotAllowCharacter(mail) || StringChecker.containsNotAllowCharacter(pass) || StringChecker.containsNotAllowCharacter(nickname)){
-            return CheckAccountResult.ERROR_NOT_ALLOW_CHAR;
+        if(checkPass != CheckAccountResult.SUCCESS){
+            return checkPass;
         }
-        if(store.containsAccountInSQL(mail)){
-            //Already registered e-address
-            return CheckAccountResult.ERROR_SAME;
+        if(checkNick != CheckAccountResult.SUCCESS){
+            return checkNick;
         }
-        if(pass.length() < 7){
-            //Need 8 characters or more
-            return CheckAccountResult.ERROR_PASSWORD_LENGTH;
-        }
+
         //SUCCESS
         return CheckAccountResult.SUCCESS;
     }
