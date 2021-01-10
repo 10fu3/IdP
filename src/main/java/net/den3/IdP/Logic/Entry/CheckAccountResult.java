@@ -1,6 +1,7 @@
 package net.den3.IdP.Logic.Entry;
 
 public enum CheckAccountResult {
+    ERROR_PERMISSION("You don't have permissions"),//権限不足
     ERROR_MAIL("Invalid e-address"), //メールアドレスではない
     ERROR_PASSWORD_LENGTH("Need 8 characters or more"), //パスワードが基準
     ERROR_SAME("Already registered e-address"), //すでに登録されたメールアドレス
