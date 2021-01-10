@@ -23,7 +23,7 @@ public class LoginAccount {
         LoginResult result;
         if(account.isPresent()){
             result = LoginResult.SUCCESS;
-            result.account = account.get();
+            result.account = account;
         }else{
             result = LoginResult.ERROR_NOT_EXIST;
         }
@@ -38,18 +38,22 @@ public class LoginAccount {
      */
     private static LoginResult authenticateAccount(String pass, LoginResult before){
         LoginResult result = before;
-        if(result != LoginResult.SUCCESS){
+        if(result != LoginResult.SUCCESS || !result.account.isPresent()){
             return before;
         }
-        IAccount resultAccount = result.account;
+        IAccount resultAccount = result.account.get();
         String generatePassword = HashGenerator.getSafetyPassword(pass,resultAccount.getMail());
-
-        System.out.println(resultAccount.getPasswordHash()+" db/input "+generatePassword);
 
         if (!resultAccount.getPasswordHash().equalsIgnoreCase(generatePassword)) {
             result = LoginResult.ERROR_WRONGPASS;
-            result.account = null;
+            result.account = Optional.empty();
         }
+
+        if(resultAccount.getAttribute().isFrozen()){
+            result = LoginResult.ERROR_FROZEN_ACCOUNT;
+            result.account = Optional.empty();
+        }
+
         return result;
     }
 }
