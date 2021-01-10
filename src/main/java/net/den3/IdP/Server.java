@@ -1,6 +1,7 @@
 package net.den3.IdP;
 
 import net.den3.IdP.Router.URLTask;
+import net.den3.IdP.Store.Account.AccountAttributeStore;
 import net.den3.IdP.Store.Account.AccountStore;
 import net.den3.IdP.Store.Account.TempAccountStore;
 import net.den3.IdP.Store.Auth.AccessTokenStore;
@@ -29,6 +30,7 @@ public class Server {
         store.inject("memory_db",new InMemoryRedis());
 
         //スレーブストア
+        store.inject("account_attribute",new AccountAttributeStore());
         store.inject("account",new AccountStore());
         store.inject("service",new ServiceStore());
         store.inject("temp_account", new TempAccountStore());
