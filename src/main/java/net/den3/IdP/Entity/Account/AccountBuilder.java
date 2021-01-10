@@ -115,8 +115,8 @@ public class AccountBuilder {
      * アカウントエンティティに空の属性を設定する
      * @return ビルダー
      */
-    public AccountBuilder setAttribute(){
-        account.attribute = new AccountAttribute(false,false);
+    public AccountBuilder setAttribute(String uuid){
+        account.attribute = new AccountAttribute(uuid,false,false);
         return this;
     }
 }
