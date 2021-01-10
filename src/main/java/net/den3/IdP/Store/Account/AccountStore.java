@@ -1,5 +1,6 @@
 package net.den3.IdP.Store.Account;
 
+import net.den3.IdP.Entity.Account.AccountAttribute;
 import net.den3.IdP.Entity.Account.AccountBuilder;
 import net.den3.IdP.Entity.Account.IAccount;
 import net.den3.IdP.Entity.Account.ITempAccount;
@@ -39,13 +40,36 @@ public class AccountStore implements IAccountStore{
     }
 
     /**
+     * 指定されたUUIDを持つアカウントがアカウントストアに登録されているかどうか
+     * @param uuid 調べる対象のUUID
+     * @return true->存在する false->存在しない
+     */
+    @Override
+    public boolean containsAccountInSQLByUUID(String uuid) {
+        List<String> columns = Arrays.asList("uuid","mail","pass","nick","icon","last_login_time");
+        Optional<List<Map<String, String>>> optionalList = store.getLineBySQL(columns,(con) -> {
+            try {
+                //account_repositoryからmailの一致するものを探してくる
+                PreparedStatement pS = con.prepareStatement("SELECT * FROM account_repository WHERE uuid = ?;");
+                pS.setString(1,uuid);
+                return Optional.of(pS);
+            } catch (SQLException sqlex) {
+                sqlex.printStackTrace();
+                return Optional.empty();
+            }
+        });
+
+        return optionalList.isPresent() && !optionalList.get().isEmpty();
+    }
+
+    /**
      * 指定されたメールアドレスを持つアカウントがアカウントストアに登録されているかどうか
      *
      * @param mail 調べる対象のメールアドレス
      * @return true->存在する false->存在しない
      */
     @Override
-    public boolean containsAccountInSQL(String mail) {
+    public boolean containsAccountInSQLByMail(String mail) {
         List<String> columns = Arrays.asList("uuid","mail","pass","nick","icon","last_login_time");
         Optional<List<Map<String, String>>> optionalList = store.getLineBySQL(columns,(con) -> {
             try {
@@ -59,7 +83,7 @@ public class AccountStore implements IAccountStore{
             }
         });
 
-        return optionalList.isPresent() && optionalList.get().size() >= 1;
+        return optionalList.isPresent() && !optionalList.get().isEmpty();
     }
 
     /**
@@ -70,6 +94,10 @@ public class AccountStore implements IAccountStore{
      */
     @Override
     public boolean updateAccountInSQL(IAccount account) {
+
+        //属性ストアの属性を変更する
+        IAccountAttributeStore.getInstance().updateAttribute(account);
+
         return store.controlSQL((con)->{
             try {
                 //account_repositoryからmailの一致するものを探してくる
@@ -97,17 +125,64 @@ public class AccountStore implements IAccountStore{
     /**
      * アカウントをDBに登録する
      *
-     * @param tempAccount 仮アカウントエンティティ
+     * @param account アカウントエンティティ
      * @return 登録されたアカウントエンティティ
      */
     @Override
-    public boolean addAccountInSQL(ITempAccount tempAccount,ITempAccountStore tempStore) {
+    public boolean addAccountInSQL(IAccount account) {
+
+        //アカウントUUID
+        String accountUUID = UUID.randomUUID().toString();
+
+        //属性ストアに属性を登録する
+        IAccountAttributeStore.getInstance().addAttribute(accountUUID,account.getAttribute());
+
         return store.controlSQL((con)->{
             try {
                 //INSET文の発行 uuid mail pass nick icon last_login_timeの順
                 PreparedStatement pS = con.prepareStatement("INSERT INTO account_repository VALUES (?,?,?,?,?,?) ;");
                 //SQL文の1個目の?にuuidを代入する
-                pS.setString(1, UUID.randomUUID().toString());
+                pS.setString(1, accountUUID);
+                //SQL文の2個目の?にmailを代入する
+                pS.setString(2, account.getMail());
+                //SQL文の3個目の?にpasshashを代入する
+                pS.setString(3, account.getPasswordHash());
+                //SQL文の4個目の?にnickを代入する
+                pS.setString(4, account.getNickName());
+                //SQL文の5個目の?に仮アカウントのアイコンを入れる
+                pS.setString(5, "https://i.imgur.com/R6tktJ6.jpg");
+                //SQL文の6個目の?に登録日時代入する
+                pS.setString(6, String.valueOf(account.getLastLoginTime()));
+
+                return Optional.of(Collections.singletonList(pS));
+            } catch (SQLException sqlex) {
+                sqlex.printStackTrace();
+                return Optional.empty();
+            }
+        });
+    }
+
+    /**
+     * アカウントをDBに登録する
+     *
+     * @param tempAccount 仮アカウントエンティティ
+     * @return 登録されたアカウントエンティティ
+     */
+    @Override
+    public boolean addAccountInSQL(ITempAccount tempAccount,ITempAccountStore tempStore) {
+
+        //アカウントUUID
+        String accountUUID = UUID.randomUUID().toString();
+
+        //属性ストアに属性を登録する
+        IAccountAttributeStore.getInstance().addAttribute(accountUUID,new AccountAttribute());
+
+        return store.controlSQL((con)->{
+            try {
+                //INSET文の発行 uuid mail pass nick icon last_login_timeの順
+                PreparedStatement pS = con.prepareStatement("INSERT INTO account_repository VALUES (?,?,?,?,?,?) ;");
+                //SQL文の1個目の?にuuidを代入する
+                pS.setString(1, accountUUID);
                 //SQL文の2個目の?にmailを代入する
                 pS.setString(2, tempAccount.getMail());
                 //SQL文の3個目の?にpasshashを代入する
@@ -227,7 +302,40 @@ public class AccountStore implements IAccountStore{
                 .setNickName(m.get("nick"))
                 .setIconURL(m.get("icon"))
                 .setLastLogin(m.get("last_login_time"))
+                .setAttribute(IAccountAttributeStore.getInstance().getAttribute(m.get("uuid")).orElse(new AccountAttribute()))
                 .build())
                 .collect(Collectors.toList()));
+    }
+
+    /**
+     * 凍結されたアカウントをすべて取得する
+     *
+     * @return [凍結されたアカウント]
+     */
+    @Override
+    public List<IAccount> getFrozenAccount() {
+        return IAccountAttributeStore
+                .getInstance()
+                .getFrozenAccount()
+                .stream()
+                .filter(this::containsAccountInSQLByUUID)
+                .map(uuid->getAccountByUUID(uuid).get())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 管理者権限を持つアカウントをすべて取得する
+     *
+     * @return [管理者権限を持つアカウント]
+     */
+    @Override
+    public List<IAccount> getAdminAccount() {
+        return IAccountAttributeStore
+                .getInstance()
+                .getAdminAccount()
+                .stream()
+                .filter(this::containsAccountInSQLByUUID)
+                .map(uuid->getAccountByUUID(uuid).get())
+                .collect(Collectors.toList());
     }
 }

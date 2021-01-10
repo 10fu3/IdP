@@ -1,5 +1,6 @@
 package net.den3.IdP.Store.Account;
 
+import net.den3.IdP.Entity.Account.AccountAttribute;
 import net.den3.IdP.Entity.Account.IAccount;
 import net.den3.IdP.Entity.Account.ITempAccount;
 import net.den3.IdP.Store.InjectionStore;
@@ -20,11 +21,18 @@ public interface IAccountStore {
     }
 
     /**
+     * 指定されたUUIDを持つアカウントがアカウントストアに登録されているかどうか
+     * @param uuid 調べる対象のUUID
+     * @return true->存在する false->存在しない
+     */
+    boolean containsAccountInSQLByUUID(String uuid);
+
+    /**
      * 指定されたメールアドレスを持つアカウントがアカウントストアに登録されているかどうか
      * @param mail 調べる対象のメールアドレス
      * @return true->存在する false->存在しない
      */
-    boolean containsAccountInSQL(String mail);
+    boolean containsAccountInSQLByMail(String mail);
 
     /**
      * アカウントの情報を更新する
@@ -33,6 +41,15 @@ public interface IAccountStore {
      * @return true → 成功 false → 失敗
      */
     boolean updateAccountInSQL(IAccount account);
+
+    /**
+     * アカウントをDBに登録する
+     *
+     * @param account アカウントエンティティ
+     * @return true → 成功 false → 失敗
+     */
+    boolean addAccountInSQL(IAccount account);
+
     /**
      * アカウントをDBに登録する
      *
@@ -70,4 +87,16 @@ public interface IAccountStore {
      * @return SQLの条件に合致したアカウントのリスト
      */
     Optional<List<IAccount>> getAccountBySQL(Function<Connection, Optional<PreparedStatement>> query);
+
+    /**
+     * 凍結されたアカウントをすべて取得する
+     * @return [凍結されたアカウント]
+     */
+    List<IAccount> getFrozenAccount();
+
+    /**
+     * 管理者権限を持つアカウントをすべて取得する
+     * @return [管理者権限を持つアカウント]
+     */
+    List<IAccount> getAdminAccount();
 }
