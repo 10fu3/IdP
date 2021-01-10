@@ -93,7 +93,7 @@
                     location.href = "/login?redirect="+encodeURI(location.href);
                 }
 
-                let token_response = fetch('http://localhost/api/v1/account/token', { 
+                let token_response = fetch(api_server+'/api/v1/account/token', {
                         method: 'get',
                         headers: new Headers({
                             'Authorization': localStorage.getItem('authorization'), 
@@ -102,7 +102,7 @@
                     token_response.then(r=>{
                         if(r.ok){
 
-                            fetch('http://localhost/api/v1/account/profile', { 
+                            fetch(api_server+'/api/v1/account/profile', {
                                 method: 'get',
                                 headers: new Headers({
                                     'Authorization': localStorage.getItem('authorization'), 
@@ -113,7 +113,7 @@
                             });
 
                             this.client_id = document.getElementsByName('client_id')[0].getAttribute('content');
-                            fetch('http://localhost/api/v1/service/', { 
+                            fetch(api_server+'/api/v1/service/', {
                                  method: 'get',
                                  headers: new Headers({
                                     'client_id': this.client_id
