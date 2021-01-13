@@ -5,19 +5,19 @@ import net.den3.IdP.Entity.Service.ServiceBuilder;
 import net.den3.IdP.Entity.Service.ServicePermission;
 import net.den3.IdP.Store.Auth.ILoginTokenStore;
 import net.den3.IdP.Store.Service.IServiceStore;
-import net.den3.IdP.Util.MapUtil;
 import net.den3.IdP.Util.ParseJSON;
 import net.den3.IdP.Util.StatusCode;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class URLUpdateService {
     public static void mainFlow(io.javalin.http.Context ctx){
         Optional<Map<String, Object>> jsonMap = ParseJSON.convertToMap(ctx.body());
         //JSON文字列をMapにコンバートできない
-        if((!jsonMap.isPresent()) || !new MapUtil<>().hasKey(jsonMap.get(), "service-id","service-name","redirect-url","icon-url","description","permissions") ){
+        if((!jsonMap.isPresent())){
             ctx.status(StatusCode.BadRequest.code());
             return;
         }
@@ -50,17 +50,32 @@ public class URLUpdateService {
     }
 
     private static IService readJSON(IService old, Map<String,Object> json){
-        ServiceBuilder builder = new ServiceBuilder();
-        builder.setRedirectURL(String.valueOf(json.get("redirect-url")))
-                .setServiceName(String.valueOf(json.get("service-name")))
-                .setServiceIconURL(String.valueOf(json.get("icon-url")))
-                .setServiceDescription(String.valueOf(json.get("description")))
-                .setAdminID(old.getAdminID())
-                .setServiceID(old.getServiceID());
-        List<String> perms = (List<String>) json.get("permissions");
-        for (int i = 0; i < perms.size(); i++) {
-            Optional<ServicePermission> optionalPerm = ServicePermission.getPermission(perms.get(i));
-            optionalPerm.ifPresent(builder::setUsedPermission);
+        ServiceBuilder builder = new ServiceBuilder(old);
+        for(String key : json.keySet()){
+            switch (key){
+                case "redirect-uri":
+                    builder.setRedirectURL(String.valueOf(json.get("redirect-uri")));
+                    break;
+                case "service-name":
+                    builder.setServiceName(String.valueOf(json.get("service-name")));
+                    break;
+                case "icon-url":
+                    builder.setServiceIconURL(String.valueOf(json.get("icon-url")));
+                    break;
+                case "description":
+                    builder.setServiceDescription(String.valueOf(json.get("description")));
+                    break;
+                case "secret-update":
+                    builder.setSecret(UUID.randomUUID().toString());
+                    break;
+                case "permissions":
+                    List<String> perms = (List<String>) json.get("permissions");
+                    for (int i = 0; i < perms.size(); i++) {
+                        Optional<ServicePermission> optionalPerm = ServicePermission.getPermission(perms.get(i));
+                        optionalPerm.ifPresent(builder::setUsedPermission);
+                    }
+                    break;
+            }
         }
         return builder.build();
     }
