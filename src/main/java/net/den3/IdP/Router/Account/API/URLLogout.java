@@ -7,7 +7,6 @@ import java.util.Optional;
 
 public class URLLogout {
     public static void mainFlow(io.javalin.http.Context ctx){
-
         Optional<String> accountUUID = ILoginTokenStore.getInstance().getAccountUUID(Optional.ofNullable(ctx.header("authorization")).orElse(""));
         if(accountUUID.isPresent()){
             String token = ctx.header("authorization");
