@@ -2,7 +2,16 @@ package net.den3.IdP.Entity.Service;
 
 
 public class ServiceBuilder {
-    private final Service service = new Service();
+    private Service service = new Service();
+
+    public ServiceBuilder(){
+
+    }
+
+    public ServiceBuilder(IService service){
+        this.service = (Service) service;
+    }
+
     /**
      * 外部連携サービスのIDをクラスに割り当てる
      * @param serviceID 外部連携サービスのID
