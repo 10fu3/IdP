@@ -1,12 +1,18 @@
 package net.den3.IdP.Router.OAuth2.Token;
 
+import net.den3.IdP.Entity.Account.IAccount;
 import net.den3.IdP.Entity.Auth.IAccessToken;
 import net.den3.IdP.Entity.Service.IService;
+import net.den3.IdP.Store.Account.IAccountStore;
 import net.den3.IdP.Store.Auth.IAccessTokenStore;
 import net.den3.IdP.Store.Auth.IAuthFlowStore;
+import net.den3.IdP.Store.Auth.ILoginTokenStore;
 import net.den3.IdP.Store.Service.IServiceStore;
+import net.den3.IdP.Util.MapBuilder;
+import net.den3.IdP.Util.ParseJSON;
 import net.den3.IdP.Util.StatusCode;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -14,6 +20,24 @@ import java.util.Optional;
  */
 public class URLRevokeToken {
     public static void mainFlow(io.javalin.http.Context ctx){
+
+        Optional<String> accountUUID = ILoginTokenStore.getInstance().getAccountUUID(Optional.ofNullable(ctx.header("authorization")).orElse(""));
+        if(accountUUID.isPresent()){
+            String uuid = accountUUID.get();
+            Optional<Map<String, String>> json = ParseJSON.convertToStringMap(ctx.body());
+            Optional<IAccount> account = IAccountStore.getInstance().getAccountByUUID(uuid);
+            if(!account.isPresent() || !json.isPresent()){
+                ctx.status(StatusCode.BadRequest.code());
+                return;
+            }
+            if(!json.get().containsKey("id")) {
+                ctx.status(StatusCode.BadRequest.code()).json(MapBuilder.New().put("error", "invalid id").build());
+                return;
+            }
+            IAuthFlowStore.getInstance().deleteAuthFlowByAccountUUID(uuid);
+            IAccessTokenStore.getInstance().deleteTokenByAccountUUID(uuid);
+            return;
+        }
 
         Optional<String> clientId = Optional.ofNullable(ctx.formParam("client_id"));
         Optional<String> secret = Optional.ofNullable(ctx.formParam("client_secret"));
