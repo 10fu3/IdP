@@ -12,6 +12,7 @@ import net.den3.IdP.Store.DBAccess;
 import net.den3.IdP.Store.InMemoryRedis;
 import net.den3.IdP.Store.InjectionStore;
 import net.den3.IdP.Store.Service.ServiceStore;
+import net.den3.IdP.Store.Upload.UploaderStore;
 
 public class Server {
 
@@ -39,6 +40,7 @@ public class Server {
         store.inject("auth_flow",new AuthFlowStore());
         store.inject("access_token",new AccessTokenStore());
         store.inject("login_token",new LoginTokenStore());
+        store.inject("upload_request",new UploaderStore());
     }
 
 
