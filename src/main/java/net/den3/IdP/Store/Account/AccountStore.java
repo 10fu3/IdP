@@ -131,18 +131,15 @@ public class AccountStore implements IAccountStore{
     @Override
     public boolean addAccountInSQL(IAccount account) {
 
-        //アカウントUUID
-        String accountUUID = UUID.randomUUID().toString();
-
         //属性ストアに属性を登録する
-        IAccountAttributeStore.getInstance().addAttribute(accountUUID,account.getAttribute());
+        IAccountAttributeStore.getInstance().addAttribute(account.getUUID(),account.getAttribute());
 
         return store.controlSQL((con)->{
             try {
                 //INSET文の発行 uuid mail pass nick icon last_login_timeの順
                 PreparedStatement pS = con.prepareStatement("INSERT INTO account_repository VALUES (?,?,?,?,?,?) ;");
                 //SQL文の1個目の?にuuidを代入する
-                pS.setString(1, accountUUID);
+                pS.setString(1, account.getUUID());
                 //SQL文の2個目の?にmailを代入する
                 pS.setString(2, account.getMail());
                 //SQL文の3個目の?にpasshashを代入する
