@@ -30,6 +30,7 @@ public class Config {
         store.put("url" , System.getenv("D3A_SELF_URL") != null ? System.getenv("D3A_SELF_URL") : "");
         store.put("loginURL" , System.getenv("D3A_LOGIN_URL") != null ? System.getenv("D3A_LOGIN_URL") : "");
         store.put("jwt_secret" , System.getenv("D3A_JWT_SECRET") != null ? System.getenv("D3A_JWT_SECRET") : UUID.randomUUID().toString());
+        store.put("uploader_token",System.getenv("D3A_UPLOADER_SECRET") != null ? System.getenv("D3A_UPLOADER_SECRET") :"");
         ServerID = UUID.randomUUID().toString();
     }
 
@@ -54,45 +55,24 @@ public class Config {
         return store.get("mail_address");
     }
 
-    public Config setEntryMailAddress(String entryMailAddress) {
-        store.put("mail_address" , entryMailAddress);
-        return this;
-    }
-
     public String getEntryMailPassword() {
         return store.get("mail_pass");
-    }
-
-    public Config setEntryMailPassword(String entryMailPassword) {
-        store.put("mail_pass",entryMailPassword);
-        return this;
     }
 
     public String getSelfURL() {
         return store.get("url");
     }
 
-    public Config setSelfURL(String selfURL) {
-        store.put("url",selfURL);
-        return this;
-    }
-
     public String getLoginURL() {
         return store.get("loginURL");
     }
 
-    public Config setLoginURL(String loginURL) {
-        store.put("loginURL",loginURL);
-        return this;
+    public String getUploaderToken(){
+        return store.get("uploader_token");
     }
 
     public String getJwtSecret(){
         return store.get("jwt_secret");
-    }
-
-    public Config setJwtSecret(String pass){
-        store.put("jwt_secret", pass);
-        return this;
     }
 
     public String getServerID(){
