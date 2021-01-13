@@ -3,6 +3,7 @@ package net.den3.IdP.Router;
 import net.den3.IdP.Router.Account.*;
 import net.den3.IdP.Router.Account.API.*;
 import net.den3.IdP.Router.OAuth2.*;
+import net.den3.IdP.Router.OAuth2.Token.URLGetTokenInfo;
 import net.den3.IdP.Router.OAuth2.Token.URLRevokeToken;
 import net.den3.IdP.Router.OAuth2.Token.URLTokenRouter;
 import net.den3.IdP.Router.OAuth2.Token.URLVerifyToken;
@@ -10,6 +11,9 @@ import net.den3.IdP.Router.Service.URLCreateService;
 import net.den3.IdP.Router.Service.URLDeleteService;
 import net.den3.IdP.Router.Service.URLGetService;
 import net.den3.IdP.Router.Service.URLUpdateService;
+import net.den3.IdP.Router.Uploader.URLGetUploadFiles;
+import net.den3.IdP.Router.Uploader.URLPostFile;
+
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -20,8 +24,10 @@ public class URLTask {
 
     public static void setupRouting(){
         webApp = io.javalin.Javalin.create().start(80);
-        webApp.before(ctx-> ctx.header("Access-Control-Allow-Origin","*"));
-
+        webApp.config.enableCorsForAllOrigins();
+        webApp.before(ctx-> ctx.header("Access-Control-Allow-Origin","*")
+                .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+                .header("Access-Control-Allow-Headers","Authorization, Content-Type, client_id"));
         webApp.routes(()-> path("/api/v1",()->{
             path("/account",()->{
                 //C
@@ -50,16 +56,17 @@ public class URLTask {
                 //D
                 delete("/",URLDeleteService::mainFlow);
             });
+            post("/img", URLPostFile::mainFlow);
+            get("/img", URLGetUploadFiles::mainFlow);
         }));
 
         webApp.routes(()-> path("/oauth2/v1",()->{
-            get("/authorize", URLAuthorizePage::mainFlow);
             post("/authorize", URLAuthorize::mainFlow);
             post("/token", URLTokenRouter::mainFlow);
+            get("/token", URLGetTokenInfo::mainFlow);
             post("/verify", URLVerifyToken::mainFlow);
             post("/revoke", URLRevokeToken::mainFlow);
         }));
-        webApp.get("/login", URLLoginPage::mainFlow);
         webApp.get("/account/register/goal/:key",URLConfirmedEntry::mainFlow);
         webApp.get("/account/register/invalid",URLConfirmedEntry::invalid);
 
