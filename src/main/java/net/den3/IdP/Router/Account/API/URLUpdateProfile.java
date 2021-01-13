@@ -1,14 +1,13 @@
 package net.den3.IdP.Router.Account.API;
 
-import net.den3.IdP.Config;
 import net.den3.IdP.Entity.Account.AccountAttribute;
 import net.den3.IdP.Entity.Account.AccountBuilder;
 import net.den3.IdP.Entity.Account.IAccount;
-import net.den3.IdP.Entity.Mail.MailEntity;
 import net.den3.IdP.Logic.Entry.CheckAccountResult;
 import net.den3.IdP.Logic.Entry.EntryAccount;
-import net.den3.IdP.Logic.Entry.MailSendService;
 import net.den3.IdP.Store.Account.IAccountStore;
+import net.den3.IdP.Store.Auth.IAccessTokenStore;
+import net.den3.IdP.Store.Auth.IAuthFlowStore;
 import net.den3.IdP.Store.Auth.ILoginTokenStore;
 import net.den3.IdP.Util.MapBuilder;
 import net.den3.IdP.Util.ParseJSON;
@@ -57,12 +56,16 @@ public class URLUpdateProfile {
 
         AccountBuilder builder = AccountBuilder.Edit(account);
 
+        //メールアドレス/パスワードが変更されるとフラグを建てる
+        boolean importantChange = false;
+
         for (String k : opReq.get().keySet()) {
             switch (k) {
                 case "mail":
                     if (filter == CheckAccountResult.SUCCESS) {
                         filter = EntryAccount.checkMail(opReq.get().get(k));
                         if(filter == CheckAccountResult.SUCCESS){
+                            importantChange = true;
                             builder.setMail(opReq.get().get(k));
                         }
                     }
@@ -78,6 +81,7 @@ public class URLUpdateProfile {
                     if (filter == CheckAccountResult.SUCCESS) {
                         filter = EntryAccount.checkPass(opReq.get().get(k));
                         if(filter == CheckAccountResult.SUCCESS){
+                            importantChange = true;
                             builder.setSecurePass(opReq.get().get(k),account.getUUID());
                         }
                     }
@@ -94,6 +98,7 @@ public class URLUpdateProfile {
                     if (filter == CheckAccountResult.SUCCESS && !admin) {
                         filter = CheckAccountResult.ERROR_PERMISSION;
                     }else{
+                        importantChange = true;
                         AccountAttribute aa = account.getAttribute();
                         builder.setAttribute(new AccountAttribute(aa.isAdmin(),"true".equalsIgnoreCase(opReq.get().get(k))));
                     }
@@ -111,8 +116,14 @@ public class URLUpdateProfile {
 
         //メールアドレスを変えてない あるいはメールアドレス以外を変えた
         if(filter == CheckAccountResult.SUCCESS){
+            IAccount newAccount = builder.build();
             //情報を更新
-            IAccountStore.getInstance().updateAccountInSQL(builder.build());
+            IAccountStore.getInstance().updateAccountInSQL(newAccount);
+            //メールアドレス/パスワード/凍結の変更処理があると,アクセストークンと認可コードを無効にする
+            if(importantChange){
+                IAuthFlowStore.getInstance().deleteAuthFlowByAccountUUID(newAccount.getUUID());
+                IAccessTokenStore.getInstance().deleteTokenByAccountUUID(newAccount.getUUID());
+            }
         }else{
             ctx.status(StatusCode.BadRequest.code()).json(MapBuilder.New().put("error",filter.getString()).build());
         }
