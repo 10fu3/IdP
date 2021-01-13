@@ -41,6 +41,7 @@ public class URLGetService {
                         .New()
                         .put("admin_id", service.get().getAdminID())
                         .put("service_id", service.get().getServiceID())
+                        .put("service_secret",service.get().getSecretID())
                         .put("redirect_url", service.get().getRedirectURL())
                         .put("service_name", service.get().getServiceName())
                         .put("redirect_url", service.get().getRedirectURL())
@@ -58,12 +59,12 @@ public class URLGetService {
             List<String> permissions = service.getUsedPermission().stream().map(ServicePermission::getName).collect(Collectors.toList());
                 return MapBuilder
                         .New()
-                        .put("admin-id", service.getAdminID())
-                        .put("service-id", service.getServiceID())
-                        .put("redirect-url", service.getRedirectURL())
-                        .put("service-name", service.getServiceName())
-                        .put("redirect-url", service.getRedirectURL())
-                        .put("icon-url", service.getServiceIconURL())
+                        .put("admin_id", service.getAdminID())
+                        .put("service_id", service.getServiceID())
+                        .put("redirect_url", service.getRedirectURL())
+                        .put("service_name", service.getServiceName())
+                        .put("redirect_url", service.getRedirectURL())
+                        .put("icon_url", service.getServiceIconURL())
                         .put("description", service.getServiceDescription())
                         .put("permissions",permissions)
                         .build();
