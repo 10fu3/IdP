@@ -14,8 +14,6 @@ import net.den3.IdP.Util.MapBuilder;
 import net.den3.IdP.Util.ParseJSON;
 import net.den3.IdP.Util.StatusCode;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class URLUpdateProfile {
@@ -56,7 +54,6 @@ public class URLUpdateProfile {
             account = target.get();
         }
 
-        String oldMail = account.getMail();
         AccountBuilder builder = AccountBuilder.Edit(account);
 
         for (String k : opReq.get().keySet()) {
@@ -90,7 +87,7 @@ public class URLUpdateProfile {
                         filter = CheckAccountResult.ERROR_PERMISSION;
                     }else{
                         AccountAttribute aa = account.getAttribute();
-                        builder.setAttribute(new AccountAttribute(account.getUUID(),aa.isAdmin(),"true".equalsIgnoreCase(opReq.get().get(k))));
+                        builder.setAttribute(new AccountAttribute(aa.isAdmin(),"true".equalsIgnoreCase(opReq.get().get(k))));
                     }
                     break;
                 case "admin":
@@ -98,17 +95,14 @@ public class URLUpdateProfile {
                         filter = CheckAccountResult.ERROR_PERMISSION;
                     }else{
                         AccountAttribute aa = account.getAttribute();
-                        builder.setAttribute(new AccountAttribute(account.getUUID(),"true".equalsIgnoreCase(opReq.get().get(k)),aa.isFrozen()));
+                        builder.setAttribute(new AccountAttribute("true".equalsIgnoreCase(opReq.get().get(k)),aa.isFrozen()));
                     }
                     break;
             }
         }
 
-//        CheckAccountResult filter = EntryAccount.checkAccount(opReq.get().get("mail"), opReq.get().get("new-pass"), opReq.get().get("nick"));
-
         //メールアドレスを変えてない あるいはメールアドレス以外を変えた
         if(filter == CheckAccountResult.SUCCESS){
-
             //情報を更新
             IAccountStore.getInstance().updateAccountInSQL(builder.build());
 
