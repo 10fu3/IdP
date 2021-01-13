@@ -1,9 +1,6 @@
 package net.den3.IdP.Entity.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public enum ServicePermission {
@@ -33,5 +30,19 @@ public enum ServicePermission {
             }
         }
         return Optional.empty();
+    }
+
+    public static List<ServicePermission> convertFromScope(String scope){
+        List<ServicePermission> perms = new ArrayList<>();
+        if(scope.contains("openid")){
+            perms.add(READ_UUID);
+        }
+        if(scope.contains("profile")){
+            perms.add(READ_PROFILE);
+        }
+        if (scope.contains("mail")){
+            perms.add(READ_MAIL);
+        }
+        return perms;
     }
 }
