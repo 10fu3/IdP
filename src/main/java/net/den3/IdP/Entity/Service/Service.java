@@ -30,16 +30,6 @@ class Service implements IService {
     }
 
     /**
-     * シークレットIDを更新
-     * @return 更新後のシークレットID
-     */
-    @Override
-    public String updateSecretID() {
-        this.ServiceSecret = UUID.randomUUID().toString();
-        return this.ServiceSecret;
-    }
-
-    /**
      * 外部連携サービスのIDを返すメソッド
      * @return 外部連携サービスのID
      */
