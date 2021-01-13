@@ -113,31 +113,6 @@ public class URLUpdateProfile {
         if(filter == CheckAccountResult.SUCCESS){
             //情報を更新
             IAccountStore.getInstance().updateAccountInSQL(builder.build());
-
-            //管理者権限による操作の場合,通知メールをださない
-            if(!opAccount.get().getUUID().equalsIgnoreCase(account.getUUID())){
-                return;
-            }
-            //送信元の名前
-            String fromName = "電子計算機研究会 アカウント情報変更通知";
-            //メール送信オブジェクト
-            MailSendService mailService = new MailSendService(Config.get().getEntryMailAddress(),Config.get().getEntryMailPassword(),fromName);
-            //非同期でメールは送られる
-            mailService.send(
-                    new MailEntity()
-                            .setTo(oldMail)
-                            .setTitle("[電子計算機研究会] アカウント情報変更の確認メール")
-                            .setBody("あなたのアカウント情報が変更されました.<br>心当たりがなければ,管理者までお問い合わせください<br>変更処理日時: "
-                                    +LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日 hh時 mm分"))),
-                    ()->{
-                        //成功したとき
-                    },
-                    ()->{
-                        //失敗したとき
-                        System.out.println("メール送信失敗");
-                    }
-            );
-
         }else{
             ctx.status(StatusCode.BadRequest.code()).json(MapBuilder.New().put("error",filter.getString()).build());
         }
