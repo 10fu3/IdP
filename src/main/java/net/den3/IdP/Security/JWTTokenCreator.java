@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import net.den3.IdP.Entity.Account.IAccount;
+import net.den3.IdP.Entity.Account.IPPID;
 import net.den3.IdP.Entity.Service.IService;
 import net.den3.IdP.Entity.Service.ServicePermission;
 
@@ -31,16 +32,17 @@ public class JWTTokenCreator {
      * 認証に用いるJWTを組み立てる
      * @param builder クレーム追加前のJWT
      * @param service 発行先のサービスのエンティティ
+     * @param ppid サービスごとに発行されるアカウント識別用のIDとアカウントUUIDを紐付けるエンティティ
      * @param account 認証したアカウントのエンティティ
      * @param selfID 認証基盤サービスそのもののID
      * @return 組み立てた終わったJWT
      */
-    public static JWTCreator.Builder addAuthenticateClaims(JWTCreator.Builder builder, IService service, IAccount account,Optional<String> nonce, String selfID){
+    public static JWTCreator.Builder addAuthenticateClaims(JWTCreator.Builder builder, IService service, IPPID ppid, IAccount account, List<ServicePermission> permissions, Optional<String> nonce, String selfID){
         Instant now = Instant.now();
         //トークンの発行者 この場合はこのIdPのURLを使う
         builder.withClaim("iss",selfID);
-        //どのアカウントかを示す文字列 Account.UUIDがこれに該当する
-        builder.withClaim("sub",account.getUUID());
+        //どのアカウントかを示す文字列 PPID.idがこれに該当する
+        builder.withClaim("sub",ppid.getID());
         //どのサービスに向けて発行したJWTなのかを示す文字列 Service.ServiceIDがこれに該当する
         builder.withClaim("aud",service.getServiceID());
         //JWTがいつまで有効なのか UNIXTime,秒で
@@ -52,12 +54,12 @@ public class JWTTokenCreator {
         //nonce値をJWTに含ませる
         nonce.ifPresent(n->builder.withClaim("nonce",n));
         //プロフィールをJWTに含ませる
-        if(service.getUsedPermission().contains(ServicePermission.READ_PROFILE)){
+        if(permissions.contains(ServicePermission.READ_PROFILE)){
             builder.withClaim("name",account.getNickName());
             builder.withClaim("picture",account.getIconURL());
         }
         //メールアドレスをJWTに含ませる
-        if(service.getUsedPermission().contains(ServicePermission.READ_MAIL)){
+        if(permissions.contains(ServicePermission.READ_MAIL)){
             builder.withClaim("mail",account.getMail());
         }
 
