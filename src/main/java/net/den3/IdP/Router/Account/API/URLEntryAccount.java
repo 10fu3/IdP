@@ -12,6 +12,7 @@ import net.den3.IdP.Util.ContentsType;
 import net.den3.IdP.Util.ParseJSON;
 import net.den3.IdP.Util.StatusCode;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +39,6 @@ public class URLEntryAccount {
         String authorization = Optional.ofNullable(ctx.header("authorization")).orElse("");
         Optional<String> uuid = ILoginTokenStore.getInstance().getAccountUUID(authorization);
         Optional<IAccount> account = IAccountStore.getInstance().getAccountByUUID(uuid.orElse(""));
-
         //管理者権限持ちアカウントが新規アカウントを強制作成する
         if(optionalReqJSON.isPresent() && account.isPresent() && account.get().getAttribute().isAdmin()){
             //JSONからメール/パスワード/ニックネームを拾う
@@ -56,12 +56,14 @@ public class URLEntryAccount {
                                          .setMail(mail)
                                          .setNickName(nickname)
                                          .setSecurePass(pass,createUUID)
-                                         .setAttribute(new AccountAttribute(createUUID,admin,frozen))
+                                         .setAttribute(new AccountAttribute(admin,frozen))
+                                         .setLastLogin(new Date().getTime())
                                          .build();
                 ctx.status((IAccountStore.getInstance().addAccountInSQL(createAccount) ? StatusCode.OK : StatusCode.BadRequest).code());
             }else{
                 ctx.status(StatusCode.BadRequest.code());
             }
+            return;
         }
 
 
