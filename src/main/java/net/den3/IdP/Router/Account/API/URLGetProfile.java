@@ -46,6 +46,7 @@ public class URLGetProfile {
                                     .New()
                                     .put("nick",account.get().getNickName())
                                     .put("icon",account.get().getIconURL())
+                                    .put("mail",account.get().getMail())
                                     .build()
                             );
                     return;
