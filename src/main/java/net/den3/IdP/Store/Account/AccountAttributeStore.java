@@ -29,8 +29,8 @@ public class AccountAttributeStore implements IAccountAttributeStore{
                                 "CREATE TABLE "+TABLE+"(" +
                                         "uuid VARCHAR(255) PRIMARY KEY," +
                                         "admin VARCHAR(5)," +
-                                        "frozen VARCHAR(5)," +
-                                        "last_login_time VARCHAR(255))")));
+                                        "frozen VARCHAR(5)" +
+                                        ")")));
             }catch (SQLException ex){
                 ex.printStackTrace();
                 return Optional.empty();
@@ -132,11 +132,6 @@ public class AccountAttributeStore implements IAccountAttributeStore{
      */
     @Override
     public void addAttribute(String uuid, AccountAttribute attribute) {
-        //アカウントUUID
-        String accountUUID = UUID.randomUUID().toString();
-
-        //属性ストアに属性を登録する
-        IAccountAttributeStore.getInstance().addAttribute(accountUUID,new AccountAttribute());
 
         store.controlSQL((con)->{
             try {
