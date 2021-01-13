@@ -1,11 +1,10 @@
 package net.den3.IdP.Entity.Account;
 
 public class AccountAttribute {
-    //議論 public final or getter
     private final boolean admin;
     private final boolean frozen;
 
-    public AccountAttribute(String uuid,boolean admin,boolean frozen){
+    public AccountAttribute(boolean admin,boolean frozen){
         this.admin = admin;
         this.frozen = frozen;
     }

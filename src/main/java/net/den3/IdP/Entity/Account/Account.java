@@ -8,12 +8,12 @@ package net.den3.IdP.Entity.Account;
 
 class Account implements IAccount{
 
-    String uuid = "";
-    Long lastLogin = 0L;
-    String mail = "";
-    String passwordHash = "";
+    String uuid;
+    Long lastLogin;
+    String mail;
+    String passwordHash;
     String iconURL = "https://i.imgur.com/R6tktJ6.jpg";
-    String nickName = "";
+    String nickName;
     AccountAttribute attribute;
 
     /**
