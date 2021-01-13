@@ -132,7 +132,7 @@ public class ServiceStore implements IServiceStore{
                     }
                 }
 
-                pS.setString(14,service.getServiceID());
+                pS.setString(15,service.getServiceID());
 
                 return Optional.of(Arrays.asList(pS));
             }catch (SQLException ex){
