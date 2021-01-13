@@ -3,13 +3,16 @@ package net.den3.IdP.Router.OAuth2;
 import com.auth0.jwt.JWT;
 import net.den3.IdP.Config;
 import net.den3.IdP.Entity.Account.IAccount;
+import net.den3.IdP.Entity.Account.IPPID;
 import net.den3.IdP.Entity.Auth.CodeChallengeMethod;
 import net.den3.IdP.Entity.Auth.IAccessToken;
 import net.den3.IdP.Entity.Auth.IAuthFlow;
 import net.den3.IdP.Entity.Service.IService;
+import net.den3.IdP.Entity.Service.ServicePermission;
 import net.den3.IdP.Security.HashGenerator;
 import net.den3.IdP.Security.JWTTokenCreator;
 import net.den3.IdP.Store.Account.IAccountStore;
+import net.den3.IdP.Store.Account.IPPIDStore;
 import net.den3.IdP.Store.Auth.IAccessTokenStore;
 import net.den3.IdP.Store.Auth.IAuthFlowStore;
 import net.den3.IdP.Store.Service.IServiceStore;
@@ -49,7 +52,15 @@ public class URLCreateToken {
             IService service = opService.get();
             IAuthFlow auth = opAuthFlow.get();
 
-            Optional<IAccount> opAccount = IAccountStore.getInstance().getAccountByUUID(auth.getAccountID());
+            //サービス別に割り振られたアカウントのIDから本来のアカウントUUIDを探す
+            Optional<IPPID> ppid = IPPIDStore
+                                    .getInstance()
+                                    .getPPID(auth.getAccountID());
+            if(!ppid.isPresent()){
+                ctx.status(StatusCode.NotFound.code()).result("ppid");
+                return;
+            }
+            Optional<IAccount> opAccount = IAccountStore.getInstance().getAccountByUUID(ppid.get().getAccountID());
 
             //そもそもアカウントがないのでアクセストークンと認可コードは削除する
             if(!opAccount.isPresent()){
@@ -116,15 +127,19 @@ public class URLCreateToken {
                     .put("scope",token.get().getScope())
                     .put("token_type","Bearer");
 
+            List<ServicePermission> perms = ServicePermission.convertFromScope(token.get().getScope());
+
             //もしopenidだったらid_tokenも返す
-            if(token.get().getScope().contains("openid")){
+            if(perms.contains(ServicePermission.READ_UUID)){
                 builder.put("id_token",
                         JWTTokenCreator
                                 .signHMAC256(
                                         JWTTokenCreator.addAuthenticateClaims(
                                                 JWT.create(),
                                                 service,
+                                                ppid.get(),
                                                 account,
+                                                perms,
                                                 token.get().getNonce(),
                                                 Config.get().getSelfURL()),
                                         service.getSecretID()
