@@ -145,7 +145,11 @@ public class AccessTokenStore implements IAccessTokenStore {
     public void deleteTokenByAccountUUID(String uuid) {
         db.controlSQL((con)->{
             try {
-                PreparedStatement ps = con.prepareStatement("DELETE FROM access_token_store where account_id = ?");
+                PreparedStatement ps = con.prepareStatement
+                        ("DELETE af FROM access_token_store AS ats " +
+                                "INNER JOIN ppid_repository AT pr " +
+                                "ON ats.uuid = pr.ppid " +
+                                "WHERE pr.account_id = ?");
                 ps.setString(1,uuid);
                 return Optional.of(Collections.singletonList(ps));
             } catch (SQLException ex) {

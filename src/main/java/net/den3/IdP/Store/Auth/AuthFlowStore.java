@@ -198,7 +198,11 @@ public class AuthFlowStore implements IAuthFlowStore{
     public void deleteAuthFlowByAccountUUID(String id) {
         db.controlSQL((con)->{
             try {
-                PreparedStatement ps = con.prepareStatement("DELETE FROM auth_flow where account_id = ?");
+                PreparedStatement ps = con.prepareStatement
+                        ("DELETE af FROM auth_flow AS af " +
+                                "INNER JOIN ppid_repository AS pr " +
+                                "ON af.uuid = pr.ppid " +
+                                "WHERE pr.account_id = ?");
                 ps.setString(1,id);
                 return Optional.of(Collections.singletonList(ps));
             } catch (SQLException ex) {
