@@ -75,6 +75,7 @@ public class URLUpdateToken {
                     .setAccessToken(UUID.randomUUID().toString())
                     .setNonce(token.getNonce())
                     .setScope(token.getScope())
+                    .setLifeTimeRefreshToken(token.getLifeTimeRefreshToken())
                     .build();
 
             IAccessTokenStore.getInstance().updateToken(newToken);
