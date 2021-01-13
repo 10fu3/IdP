@@ -123,11 +123,11 @@ public class AccountAttributeStore implements IAccountAttributeStore{
         store.controlSQL((con)->{
             try {
                 //account_repositoryからmailの一致するものを探してくる
-                PreparedStatement pS = con.prepareStatement("UPDATE "+TABLE+" SET frozen=?, admin=? WHERE uuid=?;");
+                PreparedStatement pS = con.prepareStatement("UPDATE "+TABLE+" SET admin=?, frozen=? WHERE uuid=?;");
                 //SQL文の1個めの?にmailを代入する
-                pS.setString(1, String.valueOf(account.getAttribute().isFrozen()));
+                pS.setString(1, String.valueOf(account.getAttribute().isAdmin()));
                 //SQL文の1個めの?にmailを代入する
-                pS.setString(2, String.valueOf(account.getAttribute().isAdmin()));
+                pS.setString(2, String.valueOf(account.getAttribute().isFrozen()));
 
                 pS.setString(3,account.getUUID());
                 return Optional.of(Collections.singletonList(pS));
@@ -152,11 +152,11 @@ public class AccountAttributeStore implements IAccountAttributeStore{
                 //INSET文の発行 uuid mail pass nick icon last_login_timeの順
                 PreparedStatement pS = con.prepareStatement("INSERT INTO "+TABLE+" VALUES (?,?,?) ;");
                 //SQL文の1個目の?にuuidを代入する
-                pS.setString(1, accountUUID);
+                pS.setString(1, uuid);
                 //SQL文の2個目の?にfrozenを代入する
-                pS.setString(2, String.valueOf(attribute.isFrozen()));
+                pS.setString(2, String.valueOf(attribute.isAdmin()));
                 //SQL文の3個目の?にadminを代入する
-                pS.setString(3, String.valueOf(attribute.isAdmin()));
+                pS.setString(3, String.valueOf(attribute.isFrozen()));
 
                 return Optional.of(Collections.singletonList(pS));
             } catch (SQLException sqlex) {
