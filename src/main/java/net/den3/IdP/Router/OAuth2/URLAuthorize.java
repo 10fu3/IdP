@@ -1,10 +1,13 @@
 package net.den3.IdP.Router.OAuth2;
 
 import net.den3.IdP.Entity.Account.IAccount;
+import net.den3.IdP.Entity.Account.IPPID;
+import net.den3.IdP.Entity.Account.PPIDBuilder;
 import net.den3.IdP.Entity.Auth.*;
 import net.den3.IdP.Entity.Service.IService;
 import net.den3.IdP.Entity.Service.ServicePermission;
 import net.den3.IdP.Store.Account.IAccountStore;
+import net.den3.IdP.Store.Account.IPPIDStore;
 import net.den3.IdP.Store.Auth.IAccessTokenStore;
 import net.den3.IdP.Store.Auth.IAuthFlowStore;
 import net.den3.IdP.Store.Auth.ILoginTokenStore;
@@ -23,15 +26,17 @@ import java.util.function.BiConsumer;
 public class URLAuthorize {
 
     //openid email profile
-    private static boolean hasServicePermission(IService service,String scope){
+    public static boolean hasServicePermission(IService service,String scope){
         ListUtil<ServicePermission> checker = new ListUtil<>();
         if(scope.contains("openid") && !checker.hasElement(service.getUsedPermission(),ServicePermission.READ_UUID)){
             return false;
-        }
-        if(scope.contains("email") && !checker.hasElement(service.getUsedPermission(),ServicePermission.READ_MAIL)){
+        }else if(scope.contains("email") && !checker.hasElement(service.getUsedPermission(),ServicePermission.READ_MAIL)){
             return false;
+        }else if(scope.contains("profile") && !checker.hasElement(service.getUsedPermission(), ServicePermission.READ_PROFILE)){
+            return false;
+        }else{
+            return true;
         }
-        return !scope.contains("profile") || checker.hasElement(service.getUsedPermission(), ServicePermission.READ_PROFILE);
     }
 
     public static void checkParameter(io.javalin.http.Context ctx, BiConsumer<AuthorizeParam,IService> ok){
@@ -79,10 +84,19 @@ public class URLAuthorize {
         checkParameter(ctx,(param,service)->{
             String accessToken = UUID.randomUUID().toString();
 
+            IPPID ppid = new PPIDBuilder()
+                            .setID(UUID.randomUUID().toString())
+                            .setAccountID(account.get().getUUID())
+                            .setServiceID(service.getServiceID())
+                            .build();
+
+            //サービス別のUUIDを発行する
+            IPPIDStore.getInstance().addPPID(ppid);
+
             //アクセストークンエンティティと認可フローエンティティを生成する
             IAccessToken accessTokenEntity = AccessTokenBuilder
                     .New()
-                    .setAccountID(account.get().getUUID())
+                    .setAccountID(ppid.getID())
                     .setClientID(service.getServiceID())
                     .setAccessToken(accessToken)
                     .setScope(param.getScope())
@@ -93,7 +107,7 @@ public class URLAuthorize {
                     .create()
                     .setAccessToken(accessToken)
                     .setClientID(service.getServiceID())
-                    .setAccountID(account.get().getUUID())
+                    .setAccountID(ppid.getID())
                     .setLifeTimeNow();
 
             //コードチャレンジを含む認可リクエストであればコードチャレンジの情報を追加する
