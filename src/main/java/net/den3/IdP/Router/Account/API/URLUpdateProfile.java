@@ -13,6 +13,7 @@ import net.den3.IdP.Store.Auth.ILoginTokenStore;
 import net.den3.IdP.Util.MapBuilder;
 import net.den3.IdP.Util.ParseJSON;
 import net.den3.IdP.Util.StatusCode;
+import net.den3.IdP.Util.StringChecker;
 
 import java.util.*;
 
@@ -66,7 +67,14 @@ public class URLUpdateProfile {
                         }
                     }
                     break;
-                case "new-pass":
+                case "icon":
+                    if(!StringChecker.isURL(opReq.get().get(k))){
+                        filter = CheckAccountResult.ERROR_NOT_ALLOW_CHAR;
+                        break;
+                    }
+                    builder.setIconURL(opReq.get().get(k));
+                    break;
+                case "newpass":
                     if (filter == CheckAccountResult.SUCCESS) {
                         filter = EntryAccount.checkPass(opReq.get().get(k));
                         if(filter == CheckAccountResult.SUCCESS){
