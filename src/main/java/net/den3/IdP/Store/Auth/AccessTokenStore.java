@@ -6,10 +6,7 @@ import net.den3.IdP.Store.InjectionStore;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AccessTokenStore implements IAccessTokenStore {
@@ -81,6 +78,16 @@ public class AccessTokenStore implements IAccessTokenStore {
         ).collect(Collectors.toList()));
     }
 
+    /**
+     * アクセストークンエンティティをUUIDから取得する
+     *
+     * @param uuid アカウント固有の内部ID
+     * @return アクセストークンエンティティ
+     */
+    @Override
+    public List<IAccessToken> getTokenByAccountUUID(String uuid) {
+        return getAccessToken("account_id",uuid).orElse(new ArrayList<>());
+    }
 
     /**
      * アクセストークンエンティティをUUIDから取得する
