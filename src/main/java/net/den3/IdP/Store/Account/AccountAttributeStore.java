@@ -68,14 +68,28 @@ public class AccountAttributeStore implements IAccountAttributeStore{
     }
 
     /**
-     * アカウントUUIDに紐付いているアカウント属性を取得する
-     *
-     * @param uuid アカウントUUID
-     * @return 属性
+     * 指定したアカウントの属性を返す
+     * @param uuid アカウントのUUID
+     * @return 属性エンティティ
      */
     @Override
-    public Optional<AccountAttribute> getAttribute(String uuid) {
-        return Optional.empty();
+    public Optional<AccountAttribute> getAttribute(String uuid){
+        return Optional.of(store.getLineBySQL(fieldName, (con) -> {
+            try {
+                //SQL文を組み立てている
+                //文字列結合: SQL Injectionを考慮する必要があるが,限られた列名しかアクセスされないため利用する
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM "+TABLE+" WHERE uuid = ?");
+                ps.setString(1, uuid);
+                return Optional.of(ps);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+                return Optional.empty();
+            }
+        })
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(p->new AccountAttribute("true".equalsIgnoreCase(p.get("admin")),"true".equalsIgnoreCase(p.get("frozen"))))
+                .findAny()).flatMap(p->p);
     }
 
     /**
