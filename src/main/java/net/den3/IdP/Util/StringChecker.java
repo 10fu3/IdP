@@ -1,12 +1,21 @@
 package net.den3.IdP.Util;
 
-import java.util.regex.Pattern;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class StringChecker {
     public static boolean isMailAddress(String mail){
         String pattern = "^[a-zA-Z0-9!#$%&'_`/=~*+\\-?^{|}]+(\\.[a-zA-Z0-9!#$%&'_`/=~*+\\-?^{|}]+)*+(.*)@[a-zA-Z0-9][a-zA-Z0-9\\-]*(\\.[a-zA-Z0-9\\-]+)+$";
-        Pattern p = Pattern.compile(pattern);
         return mail.matches(pattern);
+    }
+
+    public static boolean isURL(String url){
+        try {
+            new URL(url);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
     public static boolean containsNotAllowCharacter(String words){
