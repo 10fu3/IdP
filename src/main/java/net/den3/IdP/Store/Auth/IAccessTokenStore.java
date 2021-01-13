@@ -3,6 +3,7 @@ package net.den3.IdP.Store.Auth;
 import net.den3.IdP.Entity.Auth.IAccessToken;
 import net.den3.IdP.Store.InjectionStore;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IAccessTokenStore {
@@ -10,6 +11,14 @@ public interface IAccessTokenStore {
     static IAccessTokenStore getInstance() {
         return (IAccessTokenStore) InjectionStore.get().get("access_token").orElseThrow(NullPointerException::new);
     }
+
+    /**
+     * アクセストークンエンティティをアカウントUUIDから取得する
+     *
+     * @param uuid アカウント固有の内部ID
+     * @return [アクセストークンエンティティ]
+     */
+    List<IAccessToken> getTokenByAccountUUID(String uuid);
 
     /**
      * アクセストークンエンティティをUUIDから取得する
