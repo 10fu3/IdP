@@ -22,7 +22,7 @@ public class URLUpdateService {
             return;
         }
 
-        Optional<IService> oldService = IServiceStore.getInstance().getService(String.valueOf(jsonMap.get().get("service-id")));
+        Optional<IService> oldService = IServiceStore.getInstance().getService(String.valueOf(jsonMap.get().get("client_id")));
         if(!oldService.isPresent()){
             ctx.status(StatusCode.NotFound.code());
             return;
@@ -52,29 +52,30 @@ public class URLUpdateService {
     private static IService readJSON(IService old, Map<String,Object> json){
         ServiceBuilder builder = new ServiceBuilder(old);
         for(String key : json.keySet()){
-            switch (key){
-                case "redirect-uri":
-                    builder.setRedirectURL(String.valueOf(json.get("redirect-uri")));
+            switch (key) {
+                case "redirect_uri":
+                    builder.setRedirectURL(String.valueOf(json.get("redirect_uri")));
                     break;
-                case "service-name":
-                    builder.setServiceName(String.valueOf(json.get("service-name")));
+                case "service_name":
+                    builder.setServiceName(String.valueOf(json.get("service_name")));
                     break;
-                case "icon-url":
-                    builder.setServiceIconURL(String.valueOf(json.get("icon-url")));
+                case "icon_url":
+                    builder.setServiceIconURL(String.valueOf(json.get("icon_url")));
                     break;
                 case "description":
                     builder.setServiceDescription(String.valueOf(json.get("description")));
                     break;
-                case "secret-update":
+                case "secret_update":
                     builder.setSecret(UUID.randomUUID().toString());
                     break;
-                case "permissions":
-                    List<String> perms = (List<String>) json.get("permissions");
-                    for (int i = 0; i < perms.size(); i++) {
-                        Optional<ServicePermission> optionalPerm = ServicePermission.getPermission(perms.get(i));
-                        optionalPerm.ifPresent(builder::setUsedPermission);
-                    }
-                    break;
+            }
+        }
+        if(json.containsKey("permissions")){
+            List<String> perms = (List<String>) json.get("permissions");
+            builder.resetUsedPermission();
+            for (String perm : perms) {
+                Optional<ServicePermission> optionalPerm = ServicePermission.getPermission(perm);
+                optionalPerm.ifPresent(builder::setUsedPermission);
             }
         }
         return builder.build();

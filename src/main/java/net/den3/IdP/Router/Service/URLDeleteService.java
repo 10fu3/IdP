@@ -13,11 +13,11 @@ public class URLDeleteService {
     public static void mainFlow(io.javalin.http.Context ctx){
         Optional<Map<String, Object>> j = ParseJSON.convertToMap(ctx.body());
         //JSON文字列をMapにコンバートできない
-        if((!j.isPresent()) || !j.get().containsKey("service-id")){
+        if((!j.isPresent()) || !j.get().containsKey("client_id")){
             ctx.status(StatusCode.BadRequest.code());
             return;
         }
-        Optional<IService> s = IServiceStore.getInstance().getService(String.valueOf(j.get().get("service-id")));
+        Optional<IService> s = IServiceStore.getInstance().getService(String.valueOf(j.get().get("client_id")));
         //削除要求のあったサービスIDが存在しない場合
         if(!s.isPresent()){
             ctx.status(StatusCode.NotFound.code());

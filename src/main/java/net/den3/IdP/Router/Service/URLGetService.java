@@ -25,9 +25,9 @@ public class URLGetService {
             ctx.json(MapBuilder
                     .New()
                     .put("service_name",s.getServiceName())
-                    .put("service_icon",s.getServiceIconURL())
-                    .put("service_description",s.getServiceDescription())
-                    .put("service_permissions",s.getUsedPermission().stream().map(ServicePermission::getName).collect(Collectors.toList())).build());
+                    .put("icon_uri",s.getServiceIconURL())
+                    .put("description",s.getServiceDescription())
+                    .put("permissions",s.getUsedPermission().stream().map(ServicePermission::getName).collect(Collectors.toList())).build());
 
             return;
         }
@@ -40,9 +40,9 @@ public class URLGetService {
                 ctx.json(MapBuilder
                         .New()
                         .put("admin_id", service.get().getAdminID())
-                        .put("service_id", service.get().getServiceID())
+                        .put("client_id", service.get().getServiceID())
                         .put("service_secret",service.get().getSecretID())
-                        .put("redirect_url", service.get().getRedirectURL())
+                        .put("redirect_uri", service.get().getRedirectURL())
                         .put("service_name", service.get().getServiceName())
                         .put("redirect_url", service.get().getRedirectURL())
                         .put("icon_url", service.get().getServiceIconURL())
@@ -61,7 +61,7 @@ public class URLGetService {
                         .New()
                         .put("admin_id", service.getAdminID())
                         .put("service_id", service.getServiceID())
-                        .put("redirect_url", service.getRedirectURL())
+                        .put("redirect_uri", service.getRedirectURL())
                         .put("service_name", service.getServiceName())
                         .put("redirect_url", service.getRedirectURL())
                         .put("icon_url", service.getServiceIconURL())

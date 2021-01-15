@@ -23,7 +23,7 @@ public class URLCreateService {
         if((!j.isPresent())){
             ctx.status(StatusCode.BadRequest.code());
             return;
-        }else if(!new MapUtil<>().hasKey(j.get(), "service-name","redirect-url","icon-url","description","permissions")){
+        }else if(!new MapUtil<>().hasKey(j.get(), "service_name","redirect_url","icon_url","description","permissions")){
             ctx.status(StatusCode.BadRequest.code());
             return;
         }
@@ -46,9 +46,9 @@ public class URLCreateService {
 
     private static IService readJSON(Map<String,Object> json,String uuid){
         ServiceBuilder builder = new ServiceBuilder();
-        builder.setRedirectURL(String.valueOf(json.get("redirect-url")))
-                .setServiceName(String.valueOf(json.get("service-name")))
-                .setServiceIconURL(String.valueOf(json.get("icon-url")))
+        builder.setRedirectURL(String.valueOf(json.get("redirect_url")))
+                .setServiceName(String.valueOf(json.get("service_name")))
+                .setServiceIconURL(String.valueOf(json.get("icon_url")))
                 .setServiceDescription(String.valueOf(json.get("description")))
                 .setAdminID(uuid);
         List<String> perms = (List<String>) json.get("permissions");
