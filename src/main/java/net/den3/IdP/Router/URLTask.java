@@ -15,6 +15,8 @@ import net.den3.IdP.Router.Uploader.URLGetUploadFiles;
 import net.den3.IdP.Router.Uploader.URLPostFile;
 
 
+import java.util.Optional;
+
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class URLTask {
@@ -25,9 +27,22 @@ public class URLTask {
     public static void setupRouting(){
         webApp = io.javalin.Javalin.create().start(80);
         webApp.config.enableCorsForAllOrigins();
-        webApp.before(ctx-> ctx.header("Access-Control-Allow-Origin","*")
+        webApp.before(ctx-> {
+
+            //リバースプロキシ使用時に元のアドレスをたどるためのヘッダーをセットする
+            Optional.ofNullable(ctx.header("X-Forwarded-For")).ifPresent(header->{
+                String[] ips = header.split(",");
+                if(ips.length > 0){
+                    ctx.header("ip",ips[0]);
+                }else{
+                    ctx.header("ip",ctx.ip());
+                }
+            });
+
+            ctx.header("Access-Control-Allow-Origin","*")
                 .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
-                .header("Access-Control-Allow-Headers","Authorization, Content-Type, client_id"));
+                .header("Access-Control-Allow-Headers","Authorization, Content-Type, client_id");
+        });
         webApp.routes(()-> path("/api/v1",()->{
             path("/account",()->{
                 //C

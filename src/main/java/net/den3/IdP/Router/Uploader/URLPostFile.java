@@ -48,7 +48,7 @@ public class URLPostFile {
             .getInstance()
             .addUploadEntity
                  (new UploadEntityBuilder()
-                     .setRequestIp(ctx.ip())
+                     .setRequestIp(Optional.ofNullable(ctx.header("ip")).orElse("ERROR_BAD_IP"))
                      .setUploaderURL(link)
                      .setDeleteKey(delete)
                      .build());
