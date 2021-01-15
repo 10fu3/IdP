@@ -92,6 +92,15 @@ public class ServiceBuilder {
         return this;
     }
 
+    /**
+     * 外部連携アプリの使用する権限をリセットするメソッド
+     * @return 外部連携サービスクラスのインスタンス
+     */
+    public ServiceBuilder resetUsedPermission() {
+        service.UsedPermission.clear();
+        return this;
+    }
+
     public IService build(){
         return service;
     }
