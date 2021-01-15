@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class ServiceStore implements IServiceStore{
     private static final IDBAccess store = (IDBAccess) InjectionStore.get().get("rdbms").orElseThrow(NullPointerException::new);
-    private static final List<String> columns = Arrays.asList("uuid","name","admin_id","secret","url","icon","description","edit_uuid","edit_profile","read_profile","delete_self_account","read_uuid","read_mail","read_profile","read_last_login_time");
+    private static final List<String> columns = Arrays.asList("uuid","name","admin_id","secret","url","icon","description","read_uuid","read_mail","read_profile");
 
     public ServiceStore(){
         store.controlSQL((con)->{
@@ -115,7 +115,7 @@ public class ServiceStore implements IServiceStore{
         return store.controlSQL((con)->{
             try {
                 String sql = "UPDATE service SET name=?, admin_id=?, secret=? , url=?, icon=?, description=?, ";
-                sql = sql + Arrays.stream(ServicePermission.values()).map(p->p.getName()+"=?").collect(Collectors.joining(","))+" WHERE uuid=?;";
+                sql = sql + Arrays.stream(ServicePermission.values()).map(p->p.getName().toLowerCase()+"=?").collect(Collectors.joining(","))+" WHERE uuid=?;";
                 PreparedStatement pS = con.prepareStatement(sql);
                 pS.setString(1,service.getServiceName());
                 pS.setString(2,service.getAdminID());
@@ -124,16 +124,16 @@ public class ServiceStore implements IServiceStore{
                 pS.setString(5,service.getServiceIconURL());
                 pS.setString(6,service.getServiceDescription());
 
-                for (int i = 7; i < 15; i++) {
-                    if(service.getUsedPermission().contains(ServicePermission.values()[i-7])){
-                        pS.setString(i,"true");
+                ServicePermission[] perms = ServicePermission.values();
+                for (int i = 0; i< perms.length;i++){
+                    if(service.getUsedPermission().contains(perms[i])){
+                        pS.setString(i+7,"true");
                     }else{
-                        pS.setString(i,"false");
+                        pS.setString(i+7,"false");
                     }
                 }
 
-                pS.setString(15,service.getServiceID());
-
+                pS.setString(10,service.getServiceID());
                 return Optional.of(Arrays.asList(pS));
             }catch (SQLException ex){
                 ex.printStackTrace();
@@ -206,7 +206,7 @@ public class ServiceStore implements IServiceStore{
         return store.controlSQL((con)->{
             try {
                 //INSET文の発行
-                PreparedStatement pS = con.prepareStatement("INSERT INTO service VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ;");
+                PreparedStatement pS = con.prepareStatement("INSERT INTO service VALUES (?,?,?,?,?,?,?,?,?,?) ;");
                 //SQL文の個めの?にを代入する
                 pS.setString(1, service.getServiceID());
                 //SQL文の個めの?にを代入する
@@ -222,7 +222,7 @@ public class ServiceStore implements IServiceStore{
                 //SQL文の個めの?にを代入する
                 pS.setString(7, service.getServiceDescription());
 
-                for (int i = 8; i < 16; i++) {
+                for (int i = 8; i < 11; i++) {
                     if(service.getUsedPermission().contains(ServicePermission.values()[i-8])){
                         pS.setString(i,"true");
                     }else{
