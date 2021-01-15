@@ -24,7 +24,7 @@ public class URLEntryAccount {
      * @return 仮登録に必要なパラメーターがある→true ない→false
      */
     private static Boolean containsNeedKey(Map<String,String> json){
-        return json.containsKey("mail") ||  json.containsKey("pass") || json.containsKey("nick");
+        return json.containsKey("mail") &&  json.containsKey("pass") && json.containsKey("nick");
     }
 
     /**
