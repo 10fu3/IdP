@@ -43,6 +43,15 @@ public interface IPPIDStore {
     boolean containsPPID(String ppid);
 
     /**
+     * 仮名IDをサービスと内部IDで完全一致検索
+     *
+     * @param uuid 内部ID
+     * @param client_ID サービスIDEA
+     * @return ppid
+     */
+    Optional<IPPID> getPPID(String uuid,String client_ID);
+
+    /**
      * 仮名IDをストアから削除する
      * @param ppid 仮名ID
      */

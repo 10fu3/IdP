@@ -131,6 +131,38 @@ public class PPIDStore implements IPPIDStore{
     }
 
     /**
+     * 仮名IDをサービスと内部IDで完全一致検索
+     *
+     * @param uuid 内部ID
+     * @param client_ID サービスIDEA
+     * @return ppid
+     */
+    @Override
+    public Optional<IPPID> getPPID(String uuid,String client_ID) {
+        return store.getLineBySQL(fieldName, (con) -> {
+            try {
+                //SQL文を組み立てている
+                //文字列結合: SQL Injectionを考慮する必要があるが,限られた列名しかアクセスされないため利用する
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM "+TABLE+" WHERE account_id = ? AND service_id = ?");
+                ps.setString(1, uuid);
+                ps.setString(2,client_ID);
+                return Optional.of(ps);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+                return Optional.empty();
+            }
+        })
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(p-> new PPIDBuilder()
+                        .setID(p.get("ppid"))
+                        .setAccountID(p.get("account_id"))
+                        .setServiceID(p.get("service_id"))
+                        .build())
+                .collect(Collectors.toList()).stream().findFirst();
+    }
+
+    /**
      * 仮名IDをストアから削除する
      *
      * @param ppid 仮名ID

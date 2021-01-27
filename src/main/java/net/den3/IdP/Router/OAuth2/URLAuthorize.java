@@ -83,13 +83,15 @@ public class URLAuthorize {
 
         checkParameter(ctx,(param,service)->{
             String accessToken = UUID.randomUUID().toString();
-
-            IPPID ppid = new PPIDBuilder()
-                            .setID(UUID.randomUUID().toString())
-                            .setAccountID(account.get().getUUID())
-                            .setServiceID(service.getServiceID())
-                            .build();
-
+            //すでに同じサービスで同じアカウントが認可済みの場合、PPIDを変更しない
+            IPPID ppid = IPPIDStore
+                    .getInstance()
+                    .getPPID(account.get().getUUID(),service.getServiceID())
+                    .orElse(new PPIDBuilder()
+                    .setID(UUID.randomUUID().toString())
+                    .setAccountID(account.get().getUUID())
+                    .setServiceID(service.getServiceID())
+                    .build());
             //サービス別のUUIDを発行する
             IPPIDStore.getInstance().addPPID(ppid);
 
