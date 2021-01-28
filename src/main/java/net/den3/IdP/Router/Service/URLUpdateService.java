@@ -5,6 +5,7 @@ import net.den3.IdP.Entity.Service.ServiceBuilder;
 import net.den3.IdP.Entity.Service.ServicePermission;
 import net.den3.IdP.Store.Auth.ILoginTokenStore;
 import net.den3.IdP.Store.Service.IServiceStore;
+import net.den3.IdP.Util.LongUUID;
 import net.den3.IdP.Util.ParseJSON;
 import net.den3.IdP.Util.StatusCode;
 
@@ -66,7 +67,7 @@ public class URLUpdateService {
                     builder.setServiceDescription(String.valueOf(json.get("description")));
                     break;
                 case "secret_update":
-                    builder.setSecret(UUID.randomUUID().toString());
+                    builder.setSecret(LongUUID.generate());
                     break;
             }
         }
