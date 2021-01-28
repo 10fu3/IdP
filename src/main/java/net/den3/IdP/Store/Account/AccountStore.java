@@ -169,7 +169,7 @@ public class AccountStore implements IAccountStore{
     public boolean addAccountInSQL(ITempAccount tempAccount,ITempAccountStore tempStore) {
 
         //アカウントUUID
-        String accountUUID = UUID.randomUUID().toString();
+        String accountUUID = tempAccount.getAccountUUID();
 
         //属性ストアに属性を登録する
         IAccountAttributeStore.getInstance().addAttribute(accountUUID,new AccountAttribute());

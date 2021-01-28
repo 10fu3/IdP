@@ -6,7 +6,19 @@ class TemporaryAccountEntity implements ITempAccount {
     String mail = "";
     String passwordHash = "";
     Long registeredDate = 0L;
+    String accountID = "";
     String key = "";
+
+
+    /**
+     * アカウント固有のUUID
+     *
+     * @return UUID
+     */
+    @Override
+    public String getAccountUUID() {
+        return this.accountID;
+    }
 
     /**
      * 仮登録時刻を返す

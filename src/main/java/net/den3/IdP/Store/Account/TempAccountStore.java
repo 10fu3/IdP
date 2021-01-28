@@ -21,6 +21,7 @@ public class TempAccountStore implements ITempAccountStore {
                         //テーブルがなかったら作る仕組み
                         con.prepareStatement("CREATE TABLE IF NOT EXISTS temp_account_repository ("
                                 +"active_key VARCHAR(256) PRIMARY KEY, "
+                                +"account_id VARCHAR (256),"
                                 +"registered_date VARCHAR(256), "
                                 +"mail VARCHAR(256), "
                                 +"pass VARCHAR(256), "
@@ -101,6 +102,7 @@ public class TempAccountStore implements ITempAccountStore {
         Map<String, String> map = optionalList.get().stream().findAny().get();
         ITempAccount a = new TempAccountBuilder()
                             .setKey(map.get("active_key"))
+                            .setAccountUUID(map.get("account_id"))
                             .setRegisteredDate(Long.parseLong(map.get("registered_date")))
                             .setMail(map.get("mail"))
                             .setPass(map.get("pass"))
@@ -117,7 +119,7 @@ public class TempAccountStore implements ITempAccountStore {
      */
     @Override
     public Optional<ITempAccount> getAccountByKey(String key) {
-        List<String> columns = Arrays.asList("active_key","registered_date","mail","pass","nick");
+        List<String> columns = Arrays.asList("active_key","account_id","registered_date","mail","pass","nick");
         Optional<List<Map<String, String>>> optionalList = store.getLineBySQL(columns,(con) -> {
             try {
                 //account_repositoryからkeyの一致するものを探してくる
@@ -135,6 +137,7 @@ public class TempAccountStore implements ITempAccountStore {
         Map<String, String> map = optionalList.get().stream().findAny().get();
         ITempAccount a = new TempAccountBuilder()
                 .setKey(map.get("active_key"))
+                .setAccountUUID(map.get("account_id"))
                 .setRegisteredDate(Long.parseLong(map.get("registered_date")))
                 .setMail(map.get("mail"))
                 .setPass(map.get("pass"))
@@ -154,17 +157,19 @@ public class TempAccountStore implements ITempAccountStore {
         return store.controlSQL((con)->{
             try {
                 //INSET文の発行 uuid mail pass nick icon last_login_timeの順
-                PreparedStatement pS = con.prepareStatement("INSERT INTO temp_account_repository VALUES (?,?,?,?,?) ;");
+                PreparedStatement pS = con.prepareStatement("INSERT INTO temp_account_repository VALUES (?,?,?,?,?,?) ;");
                 //
                 pS.setString(1, tempAccount.getKey());
                 //
-                pS.setString(2, String.valueOf(tempAccount.getRegisteredDate()));
+                pS.setString(2,tempAccount.getAccountUUID());
                 //
-                pS.setString(3, tempAccount.getMail());
+                pS.setString(3, String.valueOf(tempAccount.getRegisteredDate()));
+                //
+                pS.setString(4, tempAccount.getMail());
                 //SQL文の1個めの?にmailを代入する
-                pS.setString(4, tempAccount.getPassHash());
+                pS.setString(5, tempAccount.getPassHash());
                 //SQL文の1個めの?にmailを代入する
-                pS.setString(5, tempAccount.getNick());
+                pS.setString(6, tempAccount.getNick());
                 return Optional.of(Collections.singletonList(pS));
             } catch (SQLException sqlex) {
                 sqlex.printStackTrace();
@@ -180,7 +185,7 @@ public class TempAccountStore implements ITempAccountStore {
      */
     @Override
     public Optional<List<ITempAccount>> getAccountsAll() {
-        List<String> columns = Arrays.asList("active_key","registered_date","mail","pass","nick");
+        List<String> columns = Arrays.asList("active_key","account_id","registered_date","mail","pass","nick");
         Optional<List<Map<String, String>>> optionalList = store.getLineBySQL(columns,(con) -> {
             try {
                 //account_repositoryからmailの一致するものを探してくる
@@ -194,6 +199,7 @@ public class TempAccountStore implements ITempAccountStore {
         return optionalList.map(list-> list.stream().map(map->
                 new TempAccountBuilder()
                     .setKey(map.get("active_key"))
+                    .setAccountUUID(map.get("account_id"))
                     .setRegisteredDate(Long.parseLong(map.get("registered_date")))
                     .setMail(map.get("mail"))
                     .setPass(map.get("pass"))

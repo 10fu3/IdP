@@ -6,6 +6,11 @@ public class TempAccountBuilder {
 
     private final TemporaryAccountEntity tae = new TemporaryAccountEntity();
 
+    public TempAccountBuilder setAccountUUID(String UUID){
+        tae.accountID = UUID;
+        return this;
+    }
+
     /**
      * 仮アカウントエンティティにメールアドレスとハッシュ化されたパスワードを代入する
      * @param key エントリーキー

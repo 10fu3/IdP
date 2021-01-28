@@ -42,7 +42,7 @@ public class LoginAccount {
             return before;
         }
         IAccount resultAccount = result.account.get();
-        String generatePassword = HashGenerator.getSafetyPassword(pass,resultAccount.getMail());
+        String generatePassword = HashGenerator.getSafetyPassword(pass,resultAccount.getUUID());
 
         if (!resultAccount.getPasswordHash().equalsIgnoreCase(generatePassword)) {
             result = LoginResult.ERROR_WRONGPASS;

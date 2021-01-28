@@ -3,6 +3,11 @@ package net.den3.IdP.Entity.Account;
 public interface ITempAccount{
 
     /**
+     * アカウント固有のUUID
+     * @return UUID
+     */
+    String getAccountUUID();
+    /**
      * 仮登録時刻を返す
      * @return 仮登録時の時間(UNIX時間)
      */

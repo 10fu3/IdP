@@ -60,12 +60,15 @@ public class EntryAccount {
         //管理に使う一時的なキーを発行
         //UUIDを発行する
         String queueID = UUID.randomUUID().toString();
+
+        String uuid = UUID.randomUUID().toString();
         //ここに仮登録処理を書く 発行時刻を1970年から秒単位で記述
         ITempAccount tempAccount = TempAccountBuilder
                                     .New()
+                                    .setAccountUUID(uuid)
                                     .setKey(queueID)
                                     .setMail(mail)
-                                    .setSecurePass(pass,mail)
+                                    .setSecurePass(pass,uuid)
                                     .setRegisteredDate(Instant.now().getEpochSecond())
                                     .setNick(nickname)
                                     .build();
