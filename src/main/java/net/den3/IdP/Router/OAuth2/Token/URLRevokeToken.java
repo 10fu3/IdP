@@ -34,8 +34,13 @@ public class URLRevokeToken {
                 ctx.status(StatusCode.BadRequest.code()).json(MapBuilder.New().put("error", "invalid id").build());
                 return;
             }
+            Optional<IService> service = IServiceStore.getInstance().getService(json.get().get("id"));
+            if(!service.isPresent()){
+                ctx.status(StatusCode.NotFound.code()).json(MapBuilder.New().put("error", "not found client id").build());
+                return;
+            }
             IAuthFlowStore.getInstance().deleteAuthFlowByAccountUUID(uuid);
-            IAccessTokenStore.getInstance().deleteTokenByAccountUUID(uuid);
+            IAccessTokenStore.getInstance().deleteTokenByAccountANDServiceID(accountUUID.get(),service.get().getServiceID());
             return;
         }
 

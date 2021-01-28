@@ -10,6 +10,8 @@ import net.den3.IdP.Store.Service.IServiceStore;
 import net.den3.IdP.Util.MapBuilder;
 import net.den3.IdP.Util.StatusCode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,16 @@ public class URLGetTokenInfo {
             ctx.status(StatusCode.Unauthorized.code());
             return;
         }
-        ctx.json(IAccessTokenStore.getInstance().getTokenByAccountUUID(uuid).stream().map(a->{
+        List<String> appendedID = new ArrayList<>();
+        ctx.json(IAccessTokenStore.getInstance().getTokenByAccountUUID(uuid).stream()
+                .filter(token->{
+                    if(!appendedID.contains(token.getClientID())){
+                        appendedID.add(token.getClientID());
+                        return true;
+                    }
+                    return false;
+                })
+                .map(a->{
             MapBuilder builder = MapBuilder.New();
             Optional<IService> service = IServiceStore.getInstance().getService(a.getClientID());
             if(!service.isPresent()){
@@ -30,7 +41,7 @@ public class URLGetTokenInfo {
             builder.put("icon_url",service.get().getServiceIconURL())
                    .put("service_name",service.get().getServiceName())
                    .put("permissions", ServicePermission.convertFromScope(a.getScope()))
-                   .put("id",a.getUUID());
+                   .put("id",a.getClientID());
             return builder.build();
         }).collect(Collectors.toList()));
     }

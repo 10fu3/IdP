@@ -46,7 +46,7 @@ public interface IPPIDStore {
      * 仮名IDをサービスと内部IDで完全一致検索
      *
      * @param uuid 内部ID
-     * @param client_ID サービスIDEA
+     * @param client_ID サービスID
      * @return ppid
      */
     Optional<IPPID> getPPID(String uuid,String client_ID);

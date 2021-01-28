@@ -83,17 +83,25 @@ public class URLAuthorize {
 
         checkParameter(ctx,(param,service)->{
             String accessToken = UUID.randomUUID().toString();
+
             //すでに同じサービスで同じアカウントが認可済みの場合、PPIDを変更しない
-            IPPID ppid = IPPIDStore
+            Optional<IPPID> opPpid = IPPIDStore
                     .getInstance()
-                    .getPPID(account.get().getUUID(),service.getServiceID())
-                    .orElse(new PPIDBuilder()
-                    .setID(UUID.randomUUID().toString())
-                    .setAccountID(account.get().getUUID())
-                    .setServiceID(service.getServiceID())
-                    .build());
-            //サービス別のUUIDを発行する
-            IPPIDStore.getInstance().addPPID(ppid);
+                    .getPPID(account.get().getUUID(), service.getServiceID());
+
+            IPPID ppid;
+
+            if(opPpid.isPresent()){
+                ppid = opPpid.get();
+            }else{
+                ppid =  new PPIDBuilder()
+                        .setID(UUID.randomUUID().toString())
+                        .setAccountID(account.get().getUUID())
+                        .setServiceID(service.getServiceID())
+                        .build();
+                //サービス別のUUIDを発行する
+                IPPIDStore.getInstance().addPPID(ppid);
+            }
 
             //アクセストークンエンティティと認可フローエンティティを生成する
             IAccessToken accessTokenEntity = AccessTokenBuilder

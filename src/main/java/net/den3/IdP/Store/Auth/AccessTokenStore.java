@@ -86,7 +86,34 @@ public class AccessTokenStore implements IAccessTokenStore {
      */
     @Override
     public List<IAccessToken> getTokenByAccountUUID(String uuid) {
-        return getAccessToken("account_id",uuid).orElse(new ArrayList<>());
+        return db.getLineBySQL(fieldName, (con) -> {
+            try {
+                PreparedStatement ps = con.prepareStatement
+                        ("SELECT * FROM access_token_store " +
+                                "JOIN ppid_repository " +
+                                "ON access_token_store.account_id = ppid_repository.ppid " +
+                                "WHERE ppid_repository.account_id = ?");
+                ps.setString(1, uuid);
+                return Optional.of(ps);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+                return Optional.empty();
+            }
+        }).map(p -> p.stream().map(line -> {
+                    AccessTokenBuilder builder = AccessTokenBuilder
+                            .New()
+                            .setUUID(line.get("uuid"))
+                            .setAccessToken(line.get("access_token"))
+                            .setRefreshToken(line.get("refresh_token"))
+                            .setAccountID(line.get("account_id"))
+                            .setClientID(line.get("service_id"))
+                            .setScope(line.get("scope"))
+                            .setLifeTimeAccessToken(Long.parseLong(line.get("token_lifetime")))
+                            .setLifeTimeRefreshToken(Long.parseLong(line.get("refresh_lifetime")))
+                            .setNonce(line.get("nonce").isEmpty() ? Optional.empty() : Optional.of(line.get("nonce")));
+                    return builder.build();
+                }
+        ).collect(Collectors.toList())).orElse(new ArrayList<>());
     }
 
     /**
@@ -146,11 +173,35 @@ public class AccessTokenStore implements IAccessTokenStore {
         db.controlSQL((con)->{
             try {
                 PreparedStatement ps = con.prepareStatement
-                        ("DELETE af FROM access_token_store AS ats " +
-                                "INNER JOIN ppid_repository AT pr " +
-                                "ON ats.uuid = pr.ppid " +
-                                "WHERE pr.account_id = ?");
+                        ("DELETE ats FROM access_token_store AS ats " +
+                                "JOIN ppid_repository AS ppid " +
+                                "ON ats.account_id = ppid.ppid " +
+                                "WHERE ppid.account_id = ?");
                 ps.setString(1,uuid);
+                return Optional.of(Collections.singletonList(ps));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return Optional.empty();
+            }
+        });
+    }
+
+    /**
+     * 特定のアカウントUUIDとサービスIDを持つアクセストークンエンティティをIdPから削除する
+     * @param accountId アカウントUUID
+     * @param serviceID サービスID
+     */
+    @Override
+    public void deleteTokenByAccountANDServiceID(String accountId,String serviceID) {
+        db.controlSQL((con)->{
+            try {
+                PreparedStatement ps = con.prepareStatement
+                        ("DELETE ats FROM access_token_store AS ats " +
+                                "JOIN ppid_repository AS ppid " +
+                                "ON ats.account_id = ppid.ppid " +
+                                "WHERE ppid.account_id = ? AND ats.service_id = ?");
+                ps.setString(1,accountId);
+                ps.setString(2,serviceID);
                 return Optional.of(Collections.singletonList(ps));
             } catch (SQLException ex) {
                 ex.printStackTrace();
