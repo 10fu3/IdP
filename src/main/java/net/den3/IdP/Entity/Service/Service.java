@@ -1,18 +1,16 @@
 package net.den3.IdP.Entity.Service;
 
 
-import net.den3.IdP.Util.MapBuilder;
-import net.den3.IdP.Util.ParseJSON;
+
+import net.den3.IdP.Util.LongUUID;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 class Service implements IService {
     String ServiceID = UUID.randomUUID().toString();
-    String ServiceSecret = UUID.randomUUID().toString();
+    String ServiceSecret = LongUUID.generate();
     String AdminID = "";
     String ServiceName = "";
     String RedirectURL = "";
