@@ -12,7 +12,6 @@ import net.den3.IdP.Util.StatusCode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 public class URLUpdateService {
     public static void mainFlow(io.javalin.http.Context ctx){
@@ -42,7 +41,7 @@ public class URLUpdateService {
 
         IService s = readJSON(oldService.get(),jsonMap.get());
         //登録
-        if(IServiceStore.getInstance().updateService(s)){
+        if(IServiceStore.getInstance().update(s)){
             ctx.status(StatusCode.OK.code());
         }else{
             //失敗

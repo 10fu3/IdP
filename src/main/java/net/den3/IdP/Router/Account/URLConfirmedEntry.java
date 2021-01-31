@@ -39,7 +39,7 @@ public class URLConfirmedEntry {
         }
 
         //DBへの追加がうまくいき,仮登録アカウントストアからも削除が成功するとtrueを返す
-        if(IAccountStore.getInstance().addAccountInSQL(tempAccount.get(),ITempAccountStore.getInstance())
+        if(IAccountStore.getInstance().add(tempAccount.get(),ITempAccountStore.getInstance())
                 && ITempAccountStore.getInstance().removeAccountInTemporaryDB(tempAccount.get().getKey())){
             ctx.redirect(Config.get().getLoginURL());
         }else{

@@ -111,7 +111,7 @@ public class ServiceStore implements IServiceStore{
      * @return 成功->true 失敗->false
      */
     @Override
-    public boolean updateService(IService service) {
+    public boolean update(IService service) {
         return store.controlSQL((con)->{
             try {
                 String sql = "UPDATE service SET name=?, admin_id=?, secret=? , url=?, icon=?, description=?, ";
@@ -148,7 +148,7 @@ public class ServiceStore implements IServiceStore{
      * @return 成功->true 失敗->false
      */
     @Override
-    public boolean deleteService(String id) {
+    public boolean delete(String id) {
         return store.controlSQL((con)->{
             List<PreparedStatement> sqlRequests = new ArrayList<>();
             try {
@@ -202,7 +202,7 @@ public class ServiceStore implements IServiceStore{
      * @return 成功->true 失敗->false
      */
     @Override
-    public boolean addService(IService service) {
+    public boolean add(IService service) {
         return store.controlSQL((con)->{
             try {
                 //INSET文の発行

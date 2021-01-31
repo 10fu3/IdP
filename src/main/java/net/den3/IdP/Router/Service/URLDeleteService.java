@@ -32,7 +32,7 @@ public class URLDeleteService {
                 return;
             }
             //ここでストアの削除処理を呼び出す
-            if(IServiceStore.getInstance().deleteService(service.getServiceID())){
+            if(IServiceStore.getInstance().delete(service.getServiceID())){
                 ctx.status(StatusCode.OK.code());
             }else{
                 ctx.status(StatusCode.InternalServerError.code());

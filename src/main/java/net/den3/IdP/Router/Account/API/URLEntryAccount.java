@@ -5,7 +5,6 @@ import net.den3.IdP.Entity.Account.AccountBuilder;
 import net.den3.IdP.Entity.Account.IAccount;
 import net.den3.IdP.Logic.Entry.CheckAccountResult;
 import net.den3.IdP.Logic.Entry.EntryAccount;
-import net.den3.IdP.Store.Account.IAccountAttributeStore;
 import net.den3.IdP.Store.Account.IAccountStore;
 import net.den3.IdP.Store.Auth.ILoginTokenStore;
 import net.den3.IdP.Util.ContentsType;
@@ -59,7 +58,7 @@ public class URLEntryAccount {
                                          .setAttribute(new AccountAttribute(admin,frozen))
                                          .setLastLogin(new Date().getTime())
                                          .build();
-                ctx.status((IAccountStore.getInstance().addAccountInSQL(createAccount) ? StatusCode.OK : StatusCode.BadRequest).code());
+                ctx.status((IAccountStore.getInstance().add(createAccount) ? StatusCode.OK : StatusCode.BadRequest).code());
             }else{
                 ctx.status(StatusCode.BadRequest.code());
             }

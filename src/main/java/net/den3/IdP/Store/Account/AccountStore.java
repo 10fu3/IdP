@@ -45,7 +45,7 @@ public class AccountStore implements IAccountStore{
      * @return true->存在する false->存在しない
      */
     @Override
-    public boolean containsAccountInSQLByUUID(String uuid) {
+    public boolean containsByUUID(String uuid) {
         List<String> columns = Arrays.asList("uuid","mail","pass","nick","icon","last_login_time");
         Optional<List<Map<String, String>>> optionalList = store.getLineBySQL(columns,(con) -> {
             try {
@@ -69,7 +69,7 @@ public class AccountStore implements IAccountStore{
      * @return true->存在する false->存在しない
      */
     @Override
-    public boolean containsAccountInSQLByMail(String mail) {
+    public boolean containsByMail(String mail) {
         List<String> columns = Arrays.asList("uuid","mail","pass","nick","icon","last_login_time");
         Optional<List<Map<String, String>>> optionalList = store.getLineBySQL(columns,(con) -> {
             try {
@@ -93,7 +93,7 @@ public class AccountStore implements IAccountStore{
      * @return true → 成功 false → 失敗
      */
     @Override
-    public boolean updateAccountInSQL(IAccount account) {
+    public boolean update(IAccount account) {
 
         //属性ストアの属性を変更する
         IAccountAttributeStore.getInstance().updateAttribute(account);
@@ -129,7 +129,7 @@ public class AccountStore implements IAccountStore{
      * @return 登録されたアカウントエンティティ
      */
     @Override
-    public boolean addAccountInSQL(IAccount account) {
+    public boolean add(IAccount account) {
 
         //属性ストアに属性を登録する
         IAccountAttributeStore.getInstance().addAttribute(account.getUUID(),account.getAttribute());
@@ -166,7 +166,7 @@ public class AccountStore implements IAccountStore{
      * @return 登録されたアカウントエンティティ
      */
     @Override
-    public boolean addAccountInSQL(ITempAccount tempAccount,ITempAccountStore tempStore) {
+    public boolean add(ITempAccount tempAccount, ITempAccountStore tempStore) {
 
         //アカウントUUID
         String accountUUID = tempAccount.getAccountUUID();
@@ -206,7 +206,7 @@ public class AccountStore implements IAccountStore{
      * @return true → 削除成功 false → 失敗
      */
     @Override
-    public boolean deleteAccountInSQL(String deleteAccount) {
+    public boolean delete(String deleteAccount) {
         return store.controlSQL((con)->{
             List<PreparedStatement> psL = new ArrayList<>();
             PreparedStatement statement;
@@ -228,7 +228,7 @@ public class AccountStore implements IAccountStore{
      */
     @Override
     public Optional<List<IAccount>> getAccountsAll() {
-        return getAccountBySQL((con)->{
+        return getAccount((con)->{
             try {
                 //account_repositoryからmailの一致するものを探してくる
                 PreparedStatement pS = con.prepareStatement("SELECT * FROM account_repository");
@@ -247,7 +247,7 @@ public class AccountStore implements IAccountStore{
      */
     @Override
     public Optional<IAccount> getAccountByMail(String mail) {
-        return getAccountBySQL((con) -> {
+        return getAccount((con) -> {
             try {
                 //account_repositoryからmailの一致するものを探してくる
                 PreparedStatement pS = con.prepareStatement("SELECT * FROM account_repository WHERE mail = ?");
@@ -268,7 +268,7 @@ public class AccountStore implements IAccountStore{
      */
     @Override
     public Optional<IAccount> getAccountByUUID(String id) {
-        Optional<List<IAccount>> accountBySQL = getAccountBySQL((con) -> {
+        Optional<List<IAccount>> accountBySQL = getAccount((con) -> {
             try {
                 //account_repositoryからmailの一致するものを探してくる
                 PreparedStatement pS = con.prepareStatement("SELECT * FROM account_repository WHERE uuid = ?");
@@ -289,7 +289,7 @@ public class AccountStore implements IAccountStore{
      * @return List[IAccount]
      */
     @Override
-    public Optional<List<IAccount>> getAccountBySQL(Function<Connection, Optional<PreparedStatement>> query) {
+    public Optional<List<IAccount>> getAccount(Function<Connection, Optional<PreparedStatement>> query) {
         List<String> columns = Arrays.asList("uuid","mail","pass","nick","icon","last_login_time");
         Optional<List<Map<String, String>>> wrapResultList = store.getLineBySQL(columns,query);
         return wrapResultList.map(maps -> maps.stream().map(m -> new AccountBuilder()
@@ -315,7 +315,7 @@ public class AccountStore implements IAccountStore{
                 .getInstance()
                 .getFrozenAccount()
                 .stream()
-                .filter(this::containsAccountInSQLByUUID)
+                .filter(this::containsByUUID)
                 .map(uuid->getAccountByUUID(uuid).get())
                 .collect(Collectors.toList());
     }
@@ -331,7 +331,7 @@ public class AccountStore implements IAccountStore{
                 .getInstance()
                 .getAdminAccount()
                 .stream()
-                .filter(this::containsAccountInSQLByUUID)
+                .filter(this::containsByUUID)
                 .map(uuid->getAccountByUUID(uuid).get())
                 .collect(Collectors.toList());
     }

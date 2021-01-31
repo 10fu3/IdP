@@ -1,6 +1,5 @@
 package net.den3.IdP.Store.Account;
 
-import net.den3.IdP.Entity.Account.AccountAttribute;
 import net.den3.IdP.Entity.Account.IAccount;
 import net.den3.IdP.Entity.Account.ITempAccount;
 import net.den3.IdP.Store.InjectionStore;
@@ -25,14 +24,14 @@ public interface IAccountStore {
      * @param uuid 調べる対象のUUID
      * @return true->存在する false->存在しない
      */
-    boolean containsAccountInSQLByUUID(String uuid);
+    boolean containsByUUID(String uuid);
 
     /**
      * 指定されたメールアドレスを持つアカウントがアカウントストアに登録されているかどうか
      * @param mail 調べる対象のメールアドレス
      * @return true->存在する false->存在しない
      */
-    boolean containsAccountInSQLByMail(String mail);
+    boolean containsByMail(String mail);
 
     /**
      * アカウントの情報を更新する
@@ -40,7 +39,7 @@ public interface IAccountStore {
      * @param account 更新するエンティティ
      * @return true → 成功 false → 失敗
      */
-    boolean updateAccountInSQL(IAccount account);
+    boolean update(IAccount account);
 
     /**
      * アカウントをDBに登録する
@@ -48,7 +47,7 @@ public interface IAccountStore {
      * @param account アカウントエンティティ
      * @return true → 成功 false → 失敗
      */
-    boolean addAccountInSQL(IAccount account);
+    boolean add(IAccount account);
 
     /**
      * アカウントをDBに登録する
@@ -56,14 +55,14 @@ public interface IAccountStore {
      * @param tempAccount 仮アカウントエンティティ
      * @return true → 成功 false → 失敗
      */
-    boolean addAccountInSQL(ITempAccount tempAccount, ITempAccountStore tempAccountStore);
+    boolean add(ITempAccount tempAccount, ITempAccountStore tempAccountStore);
     /**
      * アカウントをDBから削除する
      *
      * @param deleteAccount 削除対象のアカウントエンティティのUUID
      * @return true → 削除成功 false → 失敗
      */
-    boolean deleteAccountInSQL(String deleteAccount);
+    boolean delete(String deleteAccount);
     /**
      * データベースに登録されたアカウントをすべて取得する
      * @return アカウントエンティティのリスト
@@ -86,7 +85,7 @@ public interface IAccountStore {
      * @param query Connectionを引数に持ち戻り値がPreparedStatement>のラムダ式/クロージャ
      * @return SQLの条件に合致したアカウントのリスト
      */
-    Optional<List<IAccount>> getAccountBySQL(Function<Connection, Optional<PreparedStatement>> query);
+    Optional<List<IAccount>> getAccount(Function<Connection, Optional<PreparedStatement>> query);
 
     /**
      * 凍結されたアカウントをすべて取得する

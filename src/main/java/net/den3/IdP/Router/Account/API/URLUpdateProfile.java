@@ -118,7 +118,7 @@ public class URLUpdateProfile {
         if(filter == CheckAccountResult.SUCCESS){
             IAccount newAccount = builder.build();
             //情報を更新
-            IAccountStore.getInstance().updateAccountInSQL(newAccount);
+            IAccountStore.getInstance().update(newAccount);
             //メールアドレス/パスワード/凍結の変更処理があると,アクセストークンと認可コードを無効にする
             if(importantChange){
                 IAuthFlowStore.getInstance().deleteAuthFlowByAccountUUID(newAccount.getUUID());

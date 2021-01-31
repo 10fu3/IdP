@@ -36,7 +36,7 @@ public class URLCreateService {
         IService s = readJSON(j.get(),accountUUID.get());
 
         //登録
-        if(IServiceStore.getInstance().addService(s)){
+        if(IServiceStore.getInstance().add(s)){
             ctx.status(StatusCode.OK.code());
         }else{
             //失敗
@@ -52,8 +52,8 @@ public class URLCreateService {
                 .setServiceDescription(String.valueOf(json.get("description")))
                 .setAdminID(uuid);
         List<String> perms = (List<String>) json.get("permissions");
-        for (int i = 0; i < perms.size(); i++) {
-            Optional<ServicePermission> optionalPerm = ServicePermission.getPermission(perms.get(i));
+        for (String perm : perms) {
+            Optional<ServicePermission> optionalPerm = ServicePermission.getPermission(perm);
             optionalPerm.ifPresent(builder::setUsedPermission);
         }
         return builder.build();

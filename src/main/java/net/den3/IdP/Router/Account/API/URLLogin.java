@@ -37,7 +37,7 @@ public class URLLogin {
            ILoginTokenStore.getInstance().putToken(token,loginResult.account.get().getUUID());
 
            //ログイン時刻を更新する
-           IAccountStore.getInstance().updateAccountInSQL(AccountBuilder.Edit(loginResult.account.get()).setLastLogin(System.currentTimeMillis()/1000L).build());
+           IAccountStore.getInstance().update(AccountBuilder.Edit(loginResult.account.get()).setLastLogin(System.currentTimeMillis()/1000L).build());
 
            ctx.status(StatusCode.OK.code()).json(
                    MapBuilder

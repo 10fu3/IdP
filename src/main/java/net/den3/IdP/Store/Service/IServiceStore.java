@@ -30,20 +30,20 @@ public interface IServiceStore {
      * @param service サービスエンティティ
      * @return 成功->true 失敗->false
      */
-    boolean updateService(IService service);
+    boolean update(IService service);
 
     /**
      * サービスを削除する
      * @param id サービス固有のUUID
      * @return 成功->true 失敗->false
      */
-    boolean deleteService(String id);
+    boolean delete(String id);
 
     /**
      * 外部連携サービスを登録する
      * @return 成功->true 失敗->false
      */
-    boolean addService(IService service);
+    boolean add(IService service);
 
     /**
      * 同じ管理者IDを持つ外部連携サービスをすべてDBから取得する

@@ -32,11 +32,7 @@ public class URLAuthorize {
             return false;
         }else if(scope.contains("email") && !checker.hasElement(service.getUsedPermission(),ServicePermission.READ_MAIL)){
             return false;
-        }else if(scope.contains("profile") && !checker.hasElement(service.getUsedPermission(), ServicePermission.READ_PROFILE)){
-            return false;
-        }else{
-            return true;
-        }
+        }else return !scope.contains("profile") || checker.hasElement(service.getUsedPermission(), ServicePermission.READ_PROFILE);
     }
 
     public static void checkParameter(io.javalin.http.Context ctx, BiConsumer<AuthorizeParam,IService> ok){
@@ -101,6 +97,7 @@ public class URLAuthorize {
                         .build();
                 //サービス別のUUIDを発行する
                 IPPIDStore.getInstance().addPPID(ppid);
+                System.out.println("B "+ppid.getAccountID());
             }
 
             //アクセストークンエンティティと認可フローエンティティを生成する

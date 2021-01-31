@@ -27,7 +27,7 @@ public class URLDeleteAccount {
         if(account.get().getAttribute().isAdmin()){
             if(ctx.formParam("uuid") != null){
                 IAccountAttributeStore.getInstance().deleteAttribute(ctx.formParam("uuid"));
-                boolean result = IAccountStore.getInstance().deleteAccountInSQL(ctx.formParam("uuid"));
+                boolean result = IAccountStore.getInstance().delete(ctx.formParam("uuid"));
                 ctx.status((result ? StatusCode.OK : StatusCode.NotFound).code());
                 return;
             }
@@ -41,7 +41,7 @@ public class URLDeleteAccount {
         //属性を削除
         IAccountAttributeStore.getInstance().deleteAttribute(uuid.orElse(""));
         //アカウントを削除
-        boolean result = IAccountStore.getInstance().deleteAccountInSQL(uuid.orElse(""));
+        boolean result = IAccountStore.getInstance().delete(uuid.orElse(""));
         ctx.status((result ? StatusCode.OK : StatusCode.NotFound).code());
     }
 }

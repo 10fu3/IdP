@@ -40,8 +40,8 @@ public class URLTask {
             });
 
             ctx.header("Access-Control-Allow-Origin","*")
-                .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
-                .header("Access-Control-Allow-Headers","Authorization, Content-Type, client_id");
+               .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+               .header("Access-Control-Allow-Headers","Authorization, Content-Type, client_id");
         });
         webApp.routes(()-> path("/api/v1",()->{
             path("/account",()->{

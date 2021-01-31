@@ -1,9 +1,18 @@
 package net.den3.IdP.Router.OAuth2.Token;
 
+import com.auth0.jwt.JWT;
+import net.den3.IdP.Config;
+import net.den3.IdP.Entity.Account.IAccount;
+import net.den3.IdP.Entity.Account.IPPID;
 import net.den3.IdP.Entity.Auth.AccessTokenBuilder;
 import net.den3.IdP.Entity.Auth.IAccessToken;
 import net.den3.IdP.Entity.Service.IService;
+import net.den3.IdP.Entity.Service.ServicePermission;
+import net.den3.IdP.Security.JWTTokenCreator;
+import net.den3.IdP.Store.Account.IAccountStore;
+import net.den3.IdP.Store.Account.IPPIDStore;
 import net.den3.IdP.Store.Auth.IAccessTokenStore;
+import net.den3.IdP.Store.Auth.IAuthFlowStore;
 import net.den3.IdP.Store.Service.IServiceStore;
 import net.den3.IdP.Util.MapBuilder;
 import net.den3.IdP.Util.StatusCode;
@@ -67,6 +76,26 @@ public class URLUpdateToken {
                 return;
             }
 
+            //サービス別に割り振られたアカウントのIDから本来のアカウントUUIDを探す
+            Optional<IPPID> ppid = IPPIDStore
+                                    .getInstance()
+                                    .getPPID(token.getAccountID());
+            if(!ppid.isPresent()){
+                ctx.status(StatusCode.NotFound.code()).result("ppid");
+                return;
+            }
+            Optional<IAccount> opAccount = IAccountStore.getInstance().getAccountByUUID(ppid.get().getAccountID());
+
+            //そもそもアカウントがないのでアクセストークンを削除する
+            if(!opAccount.isPresent()){
+                ctx.status(StatusCode.NotFound.code());
+                //削除
+                IAccessTokenStore.getInstance().deleteTokenByID(token.getUUID());
+                return;
+            }
+
+            IAccount account = opAccount.get();
+
             IAccessToken newToken = AccessTokenBuilder
                     .New()
                     .setUUID(token.getUUID())
@@ -80,15 +109,35 @@ public class URLUpdateToken {
 
             IAccessTokenStore.getInstance().updateToken(newToken);
 
+            MapBuilder result = MapBuilder
+                    .New()
+                    .put("token_type", "Bearer")
+                    .put("scope", newToken.getScope())
+                    .put("access_token", newToken.getAccessToken())
+                    .put("refresh_token", newToken.getRefreshToken())
+                    .put("expires_in", IAccessToken._30DAY);
+
+            List<ServicePermission> perms = ServicePermission.convertFromScope(token.getScope());
+
+            if(ServicePermission.convertFromScope(token.getScope()).contains(ServicePermission.READ_UUID)){
+                result.put("id_token",
+                        JWTTokenCreator
+                                .signHMAC256(
+                                        JWTTokenCreator.addAuthenticateClaims(
+                                                JWT.create(),
+                                                service,
+                                                ppid.get(),
+                                                account,
+                                                perms,
+                                                Optional.empty(),
+                                                Config.get().getSelfURL()),
+                                        service.getSecretID()
+                                )
+                );
+            }
+
             ctx.status(StatusCode.OK.code())
-                .json(MapBuilder
-                     .New()
-                     .put("token_type","Bearer")
-                     .put("scope",newToken.getScope())
-                     .put("access_token",newToken.getAccessToken())
-                     .put("refresh_token",newToken.getRefreshToken())
-                     .put("expires_in",IAccessToken._30DAY)
-                     .build());
+               .json(result);
 
         }else{
             ctx.status(StatusCode.BadRequest.code());

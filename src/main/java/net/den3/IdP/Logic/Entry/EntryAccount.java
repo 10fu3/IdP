@@ -119,7 +119,7 @@ public class EntryAccount {
         if(StringChecker.containsNotAllowCharacter(mail)){
             return CheckAccountResult.ERROR_NOT_ALLOW_CHAR;
         }
-        if(IAccountStore.getInstance().containsAccountInSQLByMail(mail)){
+        if(IAccountStore.getInstance().containsByMail(mail)){
             //Already registered e-address
             return CheckAccountResult.ERROR_SAME;
         }
@@ -156,12 +156,9 @@ public class EntryAccount {
         if(checkPass != CheckAccountResult.SUCCESS){
             return checkPass;
         }
-        if(checkNick != CheckAccountResult.SUCCESS){
-            return checkNick;
-        }
+        return checkNick;
 
         //SUCCESS
-        return CheckAccountResult.SUCCESS;
     }
 
 
