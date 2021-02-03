@@ -11,7 +11,7 @@ public class URLLogout {
         if(accountUUID.isPresent()){
             String token = ctx.header("authorization");
             if (ILoginTokenStore.getInstance().deleteToken(token)) {
-                ctx.status(StatusCode.OK.code()).header("authorization","");
+                ctx.status(StatusCode.OK.code());
             } else {
                 ctx.status(StatusCode.NotFound.code());
             }

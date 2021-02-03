@@ -128,8 +128,7 @@ public class EntryAccount {
     }
 
     public static CheckAccountResult checkPass(String pass){
-        if(pass.length() < 7){
-            //Need 8 characters or more
+        if(pass.length() < Config.get().getMinimumPassword()){
             return CheckAccountResult.ERROR_PASSWORD_LENGTH;
         }
         if(StringChecker.containsNotAllowCharacter(pass)){

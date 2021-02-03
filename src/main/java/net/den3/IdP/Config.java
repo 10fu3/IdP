@@ -1,7 +1,10 @@
 package net.den3.IdP;
 
+import net.den3.IdP.Util.Errorable;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Config {
@@ -20,17 +23,16 @@ public class Config {
     }
 
     public Config(){
-
-        store.put("DockerMODE",
-                (System.getenv("D3A_ISDOCKER") != null) && System.getenv("D3A_ISDOCKER").equalsIgnoreCase("DOCKER") ? "true" : "false");
+        store.put("DatabaseURL", Optional.ofNullable(System.getenv("D3A_DB_URL")).orElse("jdbc:mariadb://localhost:3306/den3_account"));
+        store.put("RedisURL",Optional.ofNullable(System.getenv("D3A_REDIS_URL")).orElse("localhost"));
         store.put("DBAccountName" , System.getenv("D3A_DBACCOUNT") != null ? System.getenv("D3A_DBACCOUNT") : "user");
         store.put("DBAccountPassword" , System.getenv("D3A_DBPASSWORD") != null ? System.getenv("D3A_DBPASSWORD") : "password");
-        store.put("mail_address", System.getenv("D3A_MAIL_ADDRESS") != null ? System.getenv("D3A_MAIL_ADDRESS") : "");
-        store.put("mail_pass" , System.getenv("D3A_MAIL_PASS") != null ? System.getenv("D3A_MAIL_PASS") : "");
-        store.put("url" , System.getenv("D3A_SELF_URL") != null ? System.getenv("D3A_SELF_URL") : "");
-        store.put("loginURL" , System.getenv("D3A_LOGIN_URL") != null ? System.getenv("D3A_LOGIN_URL") : "");
-        store.put("jwt_secret" , System.getenv("D3A_JWT_SECRET") != null ? System.getenv("D3A_JWT_SECRET") : UUID.randomUUID().toString());
-        store.put("uploader_token",System.getenv("D3A_UPLOADER_SECRET") != null ? System.getenv("D3A_UPLOADER_SECRET") :"");
+        store.put("MailAddress", System.getenv("D3A_MAIL_ADDRESS") != null ? System.getenv("D3A_MAIL_ADDRESS") : "");
+        store.put("MailPassword" , System.getenv("D3A_MAIL_PASS") != null ? System.getenv("D3A_MAIL_PASS") : "");
+        store.put("URL" , System.getenv("D3A_SELF_URL") != null ? System.getenv("D3A_SELF_URL") : "");
+        store.put("LoginURL" , System.getenv("D3A_LOGIN_URL") != null ? System.getenv("D3A_LOGIN_URL") : "");
+        store.put("UploaderToken",System.getenv("D3A_UPLOADER_SECRET") != null ? System.getenv("D3A_UPLOADER_SECRET") :"");
+        store.put("MinimumPassword", new Errorable<String,String>().of(System.getenv("D3A_MINIMUM_PASS"),"8",(v)->String.valueOf(Integer.valueOf(v))));
         ServerID = UUID.randomUUID().toString();
     }
 
@@ -43,39 +45,35 @@ public class Config {
     }
 
     public String getDBURL(){
-
-        return "true".equalsIgnoreCase(store.get("DockerMODE")) ? "jdbc:mariadb://db:3306/den3_account" : "jdbc:mariadb://localhost:3306/den3_account";
+        return store.get("DatabaseURL");
     }
 
     public String getRedisURL(){
-        return "true".equalsIgnoreCase(store.get("DockerMODE")) ? "redis" : "localhost";
+        return store.get("RedisURL");
     }
 
     public String getEntryMailAddress() {
-        return store.get("mail_address");
+        return store.get("MailAddress");
     }
 
     public String getEntryMailPassword() {
-        return store.get("mail_pass");
+        return store.get("MailPassword");
     }
 
     public String getSelfURL() {
-        return store.get("url");
+        return store.get("URL");
     }
 
     public String getLoginURL() {
-        return store.get("loginURL");
+        return store.get("LoginURL");
     }
 
     public String getUploaderToken(){
-        return store.get("uploader_token");
+        return store.get("UploaderToken");
     }
 
-    public String getJwtSecret(){
-        return store.get("jwt_secret");
+    public Integer getMinimumPassword(){
+        return Integer.valueOf(store.get("MinimumPassword"));
     }
 
-    public String getServerID(){
-        return ServerID;
-    }
 }
