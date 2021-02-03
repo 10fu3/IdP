@@ -13,12 +13,13 @@ services:
     environment:
       D3A_DBACCOUNT: ""
       D3A_DBPASSWORD: ""
-      D3A_ISDOCKER: "DOCKER"
+      D3A_DB_URL: ""
+      D3A_REDIS_URL: ""
+      D3A_MINIMUM_PASS: ""
       D3A_MAIL_ADDRESS: ""
       D3A_MAIL_PASS: ""
       D3A_SELF_URL: "http://localhost"
       D3A_LOGIN_URL: "http://localhost/login"
-      D3A_JWT_SECRET: ""
       D3A_UPLOADER_SECRET: ""
     command: java -jar target/IdP-1.0-all.jar
   db:
