@@ -1,5 +1,5 @@
 /docker-compose-used.yml
 /target/*
-!/target/IdP-1.0.jar
+!/target/IdP-1.0-all.jar
 /.idea/
 /IdP.iml
