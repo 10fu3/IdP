@@ -132,18 +132,21 @@ public class URLCreateToken {
             //もしopenidだったらid_tokenも返す
             if(perms.contains(ServicePermission.READ_UUID)){
                 builder.put("id_token",
+                    JWTTokenCreator
+                    .signHMAC256(
                         JWTTokenCreator
-                                .signHMAC256(
-                                        JWTTokenCreator.addAuthenticateClaims(
-                                                JWT.create(),
-                                                service,
-                                                ppid.get(),
-                                                account,
-                                                perms,
-                                                token.get().getNonce(),
-                                                Config.get().getSelfURL()),
-                                        service.getSecretID()
-                                )
+                        .addAuthenticateClaims(
+                            JWT.create(),
+                            service,
+                            ppid.get(),
+                            account,
+                            perms,
+                            token.get().getNonce(),
+                            Config.get().getSelfURL(),
+                            Config.get().getIDTokenValidMinutes()
+                        ),
+                        service.getSecretID()
+                    )
                 );
             }
             ctx.json(builder.build());

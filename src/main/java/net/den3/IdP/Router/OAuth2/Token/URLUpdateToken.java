@@ -121,18 +121,21 @@ public class URLUpdateToken {
 
             if(ServicePermission.convertFromScope(token.getScope()).contains(ServicePermission.READ_UUID)){
                 result.put("id_token",
+                    JWTTokenCreator
+                    .signHMAC256(
                         JWTTokenCreator
-                                .signHMAC256(
-                                        JWTTokenCreator.addAuthenticateClaims(
-                                                JWT.create(),
-                                                service,
-                                                ppid.get(),
-                                                account,
-                                                perms,
-                                                Optional.empty(),
-                                                Config.get().getSelfURL()),
-                                        service.getSecretID()
-                                )
+                        .addAuthenticateClaims(
+                            JWT.create(),
+                            service,
+                            ppid.get(),
+                            account,
+                            perms,
+                            Optional.empty(),
+                            Config.get().getSelfURL(),
+                            Config.get().getIDTokenValidMinutes()
+                        ),
+                        service.getSecretID()
+                    )
                 );
             }
 

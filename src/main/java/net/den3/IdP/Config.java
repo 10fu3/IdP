@@ -33,6 +33,7 @@ public class Config {
         store.put("LoginURL" , System.getenv("D3A_LOGIN_URL") != null ? System.getenv("D3A_LOGIN_URL") : "");
         store.put("UploaderToken",System.getenv("D3A_UPLOADER_SECRET") != null ? System.getenv("D3A_UPLOADER_SECRET") :"");
         store.put("MinimumPassword", new Errorable<String,String>().of(System.getenv("D3A_MINIMUM_PASS"),"8",(v)->String.valueOf(Integer.valueOf(v))));
+        store.put("IDTokenValidTime", new Errorable<String,String>().of(System.getenv("D3A_IDTOKEN_VALID_TIME_MINUTE"),"5",(v)->String.valueOf(Long.valueOf(v))));
         ServerID = UUID.randomUUID().toString();
     }
 
@@ -76,4 +77,7 @@ public class Config {
         return Integer.valueOf(store.get("MinimumPassword"));
     }
 
+    public Long getIDTokenValidMinutes(){
+        return Long.valueOf(store.get("IDTokenValidTime"));
+    }
 }

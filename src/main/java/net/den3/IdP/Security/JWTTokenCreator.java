@@ -24,11 +24,6 @@ public class JWTTokenCreator {
     private static final List<String> fields = Arrays.asList("mail","profile","last_login_time");
 
     /**
-     * 1日を秒で表現
-     */
-    private static final Long DAY = (60L * 60L * 24L);
-
-    /**
      * 認証に用いるJWTを組み立てる
      * @param builder クレーム追加前のJWT
      * @param service 発行先のサービスのエンティティ
@@ -37,7 +32,7 @@ public class JWTTokenCreator {
      * @param selfID 認証基盤サービスそのもののID
      * @return 組み立てた終わったJWT
      */
-    public static JWTCreator.Builder addAuthenticateClaims(JWTCreator.Builder builder, IService service, IPPID ppid, IAccount account, List<ServicePermission> permissions, Optional<String> nonce, String selfID){
+    public static JWTCreator.Builder addAuthenticateClaims(JWTCreator.Builder builder, IService service, IPPID ppid, IAccount account, List<ServicePermission> permissions, Optional<String> nonce, String selfID,Long validTime){
         Instant now = Instant.now();
         //トークンの発行者 この場合はこのIdPのURLを使う
         builder.withClaim("iss",selfID);
@@ -46,7 +41,7 @@ public class JWTTokenCreator {
         //どのサービスに向けて発行したJWTなのかを示す文字列 Service.ServiceIDがこれに該当する
         builder.withClaim("aud",service.getServiceID());
         //JWTがいつまで有効なのか UNIXTime,秒で
-        builder.withClaim("exp",now.plusSeconds(DAY).getEpochSecond());
+        builder.withClaim("exp",now.plusSeconds(validTime).getEpochSecond());
         //JWTが発行された時間 この場合は発行している最中 UNIXTime,秒で
         builder.withClaim("iat",now.getEpochSecond());
         //JWTがオリジナルであることを証明する文字列 被らないものを使う必要がある

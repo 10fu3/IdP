@@ -21,6 +21,7 @@ services:
       D3A_SELF_URL: "http://localhost"
       D3A_LOGIN_URL: "http://localhost/login"
       D3A_UPLOADER_SECRET: ""
+      D3A_IDTOKEN_VALID_TIME_MINUTE: "5"
     command: java -jar target/IdP-1.0-all.jar
   db:
     image: mariadb:latest
