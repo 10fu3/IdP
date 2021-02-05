@@ -6,6 +6,9 @@
 # メインの機能
 <img width="561" alt="スクリーンショット 2021-01-29 5 07 04" src="https://user-images.githubusercontent.com/31952653/106192896-1eb29f00-61f0-11eb-90e2-d0bc93cc4736.png">
 
+# ER図(?)
+![er-idp](https://user-images.githubusercontent.com/31952653/107018156-6aaea680-67e3-11eb-9f60-3d2993d2aee3.PNG)
+
 # ログイン画面
 <img width="561" alt="スクリーンショット 2021-01-29 5 19 09" src="https://user-images.githubusercontent.com/31952653/106193945-861d1e80-61f1-11eb-85a0-36e4879e1dbd.png">
 
