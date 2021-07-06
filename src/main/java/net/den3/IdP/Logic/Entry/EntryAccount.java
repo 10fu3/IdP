@@ -88,8 +88,8 @@ public class EntryAccount {
         mailService.send(
                 new MailEntity()
                 .setTo(mail)
-                .setTitle("[電子計算機研究会] 仮登録申請の確認メール")
-                .setBody("仮登録ありがとうございます.<br>本登録をするには本メール到着後1日以内に次のURLにアクセスしてください <br>"+
+                .setTitle(Config.get().getEntryMailTitle())
+                .setBody(config.getEntryMailBody()+
                         config.getSelfURL()+"/account/register/goal/"+queueID),
                 ()->{
                     //成功したとき (特に何もしない)
@@ -122,6 +122,9 @@ public class EntryAccount {
         if(IAccountStore.getInstance().containsByMail(mail)){
             //Already registered e-address
             return CheckAccountResult.ERROR_SAME;
+        }
+        if(!mail.matches(Config.get().getEntryMailRegex())){
+            return CheckAccountResult.ERROR_NOT_MATCH_DOMAIN;
         }
         //SUCCESS
         return CheckAccountResult.SUCCESS;

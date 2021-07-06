@@ -6,6 +6,7 @@ public enum CheckAccountResult {
     ERROR_PASSWORD_LENGTH("Need 8 characters or more"), //パスワードが基準
     ERROR_SAME("Already registered e-address"), //すでに登録されたメールアドレス
     ERROR_NOT_ALLOW_CHAR("Not allowed characters contain"), // { } , が含まれている
+    ERROR_NOT_MATCH_DOMAIN("Not allowed domain"), // 許可されていないドメイン名になっている
     SUCCESS("");//成功したのでメッセージはとくにない
 
     private final String text;
