@@ -23,6 +23,7 @@ public class Config {
     }
 
     public Config(){
+        store.put("Port",Optional.ofNullable(System.getenv("PORT")).orElse("80"));
         store.put("DatabaseURL", Optional.ofNullable(System.getenv("DB_URL")).orElse("jdbc:mariadb://localhost:3306/den3_account"));
         store.put("RedisURL",Optional.ofNullable(System.getenv("REDIS_URL")).orElse("localhost"));
         store.put("DBAccountName" , System.getenv("DBACCOUNT") != null ? System.getenv("DBACCOUNT") : "user");
@@ -38,6 +39,10 @@ public class Config {
         store.put("MinimumPassword", new Errorable<String,String>().of(System.getenv("MINIMUM_PASS"),"8",(v)->String.valueOf(Integer.valueOf(v))));
         store.put("IDTokenValidTime", new Errorable<String,String>().of(System.getenv("IDTOKEN_VALID_TIME_MINUTE"),"5",(v)->String.valueOf(Long.valueOf(v))));
         ServerID = UUID.randomUUID().toString();
+    }
+
+    public int getPort(){
+        return Integer.parseInt(store.get("Port"));
     }
 
     public String getDBAccountName() {

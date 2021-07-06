@@ -1,5 +1,6 @@
 package net.den3.IdP.Router;
 
+import net.den3.IdP.Config;
 import net.den3.IdP.Router.Account.*;
 import net.den3.IdP.Router.Account.API.*;
 import net.den3.IdP.Router.OAuth2.*;
@@ -25,7 +26,7 @@ public class URLTask {
 
 
     public static void setupRouting(){
-        webApp = io.javalin.Javalin.create().start(80);
+        webApp = io.javalin.Javalin.create().start(Config.get().getPort());
         webApp.config.enableCorsForAllOrigins();
         webApp.before(ctx-> {
 
