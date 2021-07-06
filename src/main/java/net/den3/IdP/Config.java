@@ -56,10 +56,6 @@ public class Config {
         return store.get("RedisURL");
     }
 
-    public String getEntryMailRegex() {
-        return store.get("EntryMailAddressRegex");
-    }
-
     public String getEntryMailAddress() {
         return store.get("MailAddress");
     }
@@ -74,6 +70,10 @@ public class Config {
 
     public String getEntryMailBody() {
         return store.get("EntryMailBody");
+    }
+
+    public String getEntryMailRegex(){
+        return  store.get("EntryMailAddressRegex");
     }
 
     public String getSelfURL() {
