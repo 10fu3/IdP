@@ -23,17 +23,20 @@ public class Config {
     }
 
     public Config(){
-        store.put("DatabaseURL", Optional.ofNullable(System.getenv("D3A_DB_URL")).orElse("jdbc:mariadb://localhost:3306/den3_account"));
-        store.put("RedisURL",Optional.ofNullable(System.getenv("D3A_REDIS_URL")).orElse("localhost"));
-        store.put("DBAccountName" , System.getenv("D3A_DBACCOUNT") != null ? System.getenv("D3A_DBACCOUNT") : "user");
-        store.put("DBAccountPassword" , System.getenv("D3A_DBPASSWORD") != null ? System.getenv("D3A_DBPASSWORD") : "password");
-        store.put("MailAddress", System.getenv("D3A_MAIL_ADDRESS") != null ? System.getenv("D3A_MAIL_ADDRESS") : "");
-        store.put("MailPassword" , System.getenv("D3A_MAIL_PASS") != null ? System.getenv("D3A_MAIL_PASS") : "");
-        store.put("URL" , System.getenv("D3A_SELF_URL") != null ? System.getenv("D3A_SELF_URL") : "");
-        store.put("LoginURL" , System.getenv("D3A_LOGIN_URL") != null ? System.getenv("D3A_LOGIN_URL") : "");
-        store.put("UploaderToken",System.getenv("D3A_UPLOADER_SECRET") != null ? System.getenv("D3A_UPLOADER_SECRET") :"");
-        store.put("MinimumPassword", new Errorable<String,String>().of(System.getenv("D3A_MINIMUM_PASS"),"8",(v)->String.valueOf(Integer.valueOf(v))));
-        store.put("IDTokenValidTime", new Errorable<String,String>().of(System.getenv("D3A_IDTOKEN_VALID_TIME_MINUTE"),"5",(v)->String.valueOf(Long.valueOf(v))));
+        store.put("DatabaseURL", Optional.ofNullable(System.getenv("DB_URL")).orElse("jdbc:mariadb://localhost:3306/den3_account"));
+        store.put("RedisURL",Optional.ofNullable(System.getenv("REDIS_URL")).orElse("localhost"));
+        store.put("DBAccountName" , System.getenv("DBACCOUNT") != null ? System.getenv("DBACCOUNT") : "user");
+        store.put("DBAccountPassword" , System.getenv("DBPASSWORD") != null ? System.getenv("DBPASSWORD") : "password");
+        store.put("MailAddress", System.getenv("MAIL_ADDRESS") != null ? System.getenv("MAIL_ADDRESS") : "");
+        store.put("MailPassword" , System.getenv("MAIL_PASS") != null ? System.getenv("MAIL_PASS") : "");
+        store.put("EntryMailTitle",System.getenv("MAIL_TITLE") != null ? System.getenv("MAIL_TITLE") : "[電子計算機研究会] 仮登録申請の確認メール");
+        store.put("EntryMailBody",System.getenv("MAIL_BODY") != null ? System.getenv("MAIL_BODY") : "仮登録ありがとうございます.<br>本登録をするには本メール到着後1日以内に次のURLにアクセスしてください <br>");
+        store.put("EntryMailAddressRegex", System.getenv("MAIL_ADDRESS_REGEX") != null ? System.getenv("MAIL_ADDRESS_REGEX") : ".+");
+        store.put("URL" , System.getenv("SELF_URL") != null ? System.getenv("SELF_URL") : "");
+        store.put("LoginURL" , System.getenv("LOGIN_URL") != null ? System.getenv("LOGIN_URL") : "");
+        store.put("UploaderToken",System.getenv("UPLOADER_SECRET") != null ? System.getenv("UPLOADER_SECRET") :"");
+        store.put("MinimumPassword", new Errorable<String,String>().of(System.getenv("MINIMUM_PASS"),"8",(v)->String.valueOf(Integer.valueOf(v))));
+        store.put("IDTokenValidTime", new Errorable<String,String>().of(System.getenv("IDTOKEN_VALID_TIME_MINUTE"),"5",(v)->String.valueOf(Long.valueOf(v))));
         ServerID = UUID.randomUUID().toString();
     }
 
@@ -53,12 +56,24 @@ public class Config {
         return store.get("RedisURL");
     }
 
+    public String getEntryMailRegex() {
+        return store.get("EntryMailAddressRegex");
+    }
+
     public String getEntryMailAddress() {
         return store.get("MailAddress");
     }
 
     public String getEntryMailPassword() {
         return store.get("MailPassword");
+    }
+
+    public String getEntryMailTitle() {
+        return store.get("EntryMailTitle");
+    }
+
+    public String getEntryMailBody() {
+        return store.get("EntryMailBody");
     }
 
     public String getSelfURL() {
