@@ -44,6 +44,9 @@ public class URLTask {
                .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
                .header("Access-Control-Allow-Headers","Authorization, Content-Type, client_id");
         });
+
+        webApp.get("/",(ctx)-> ctx.result("heart beat"));
+
         webApp.routes(()-> path("/api/v1",()->{
             path("/account",()->{
                 //C
