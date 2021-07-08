@@ -1,1 +1,1 @@
-web:    java -cp "target/dependency/*":target/classes net.den3.IdP.Main
+web: java -jar target/IdP-1.0-all.jar
