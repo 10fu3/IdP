@@ -1,0 +1,1 @@
+web:    java -cp "target/dependency/*":target/classes net.den3.IdP.Main
