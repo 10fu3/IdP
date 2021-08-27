@@ -89,9 +89,10 @@ public class LoginTokenStore implements ILoginTokenStore{
     public void putToken(String token, String uuid) {
         db.controlSQL((con)->{
             try {
-                PreparedStatement ps = con.prepareStatement("INSERT INTO login_token VALUES (?,?) ;");
+                PreparedStatement ps = con.prepareStatement("INSERT INTO login_token VALUES (?,?,?) ;");
                 ps.setString(1,token);
                 ps.setString(2,uuid);
+                ps.setString(3,String.valueOf(System.currentTimeMillis()+DAY_UNIX_TIME));
                 return Optional.of(Collections.singletonList(ps));
             } catch (SQLException ex) {
                 ex.printStackTrace();
