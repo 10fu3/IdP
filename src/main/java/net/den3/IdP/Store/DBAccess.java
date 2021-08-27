@@ -47,7 +47,7 @@ public class DBAccess implements IDBAccess{
      * SQLに登録したデータはすべて文字列であるという前提なので数字を含むテーブルの場合は使わないこと
      * @param columns テーブルに存在するすべての列名のリスト
      * @param statement Connectionを引数に持ち戻り値がPreparedStatement>のラムダ式/クロージャ
-     * @return Optional<List<Map<列名,値>>>
+     * @return List<Map<列名,値>>
      */
     @Override
     public Optional<List<Map<String,String>>> getLineBySQL(List<String> columns, Function<Connection, Optional<PreparedStatement>> statement) {
