@@ -13,13 +13,6 @@ public interface ILoginTokenStore {
     }
 
     /**
-     * アカウントのUUIDから登録されたトークンを取得する
-     * @param accountUUID アカウントに紐付けされたUUID
-     * @return List[トークン]
-     */
-    List<String> getTokens(String accountUUID);
-
-    /**
      * 登録されたトークンから紐づけられたアカウントUUIDを取得する
      * @param token トークン
      * @return Optional[紐づけられたアカウントUUID]
@@ -53,17 +46,4 @@ public interface ILoginTokenStore {
      * @return true->成功 false->失敗
      */
     boolean deleteToken(String token);
-
-    /**
-     * 登録されたアカウントのUUIDとトークンを返す
-     * @return List<Map<アカウントのUUID:String,トークン:String>>
-     */
-    Map<String,String> getAllTokens();
-
-    /**
-     * アカウントに紐づけられたトークンを更新する
-     * @param token アカウントに紐付けされたUUID
-     * @return 更新後のトークン
-     */
-    Optional<String> updateToken(String token);
 }

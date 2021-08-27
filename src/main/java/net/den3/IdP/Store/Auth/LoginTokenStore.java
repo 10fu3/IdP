@@ -1,32 +1,47 @@
 package net.den3.IdP.Store.Auth;
 
-import net.den3.IdP.Store.IInMemoryDB;
+import net.den3.IdP.Entity.Auth.AuthFlowBuilder;
+import net.den3.IdP.Entity.Auth.CodeChallengeMethod;
+import net.den3.IdP.Entity.Auth.IAuthFlow;
+import net.den3.IdP.Store.IDBAccess;
 import net.den3.IdP.Store.InjectionStore;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class LoginTokenStore implements ILoginTokenStore {
-    private final IInMemoryDB store = (IInMemoryDB)InjectionStore.get().get("memory_db").orElseThrow(NullPointerException::new);
+public class LoginTokenStore implements ILoginTokenStore{
 
-    //一か月を秒数で定義
-    private final static Integer MONTH = 60*60*24*30;
+    private final Long DAY_UNIX_TIME = 24L*60L*60L;
 
-    private static final String PREFIX = "ACCOUNT_TOKEN: ";
+    private final List<String> fieldName = Arrays.asList("uuid","account_id","expired_at");
 
-    /**
-     * アカウントのUUIDから登録されたトークンを取得する
-     *
-     * @param accountUUID アカウントに紐付けされたUUID
-     * @return Optional String->トークン empty->存在しない
-     */
-    @Override
-    public List<String> getTokens(String accountUUID) {
-        Map<String, String> stores = store.getPairs(PREFIX);
-        return stores.keySet().stream().filter(k->accountUUID.equalsIgnoreCase(stores.get(k))).map(stores::get).collect(Collectors.toList());
+    IDBAccess db = (IDBAccess) InjectionStore.get().get("rdbms").orElseThrow(NullPointerException::new);
+
+    static ILoginTokenStore getInstance(){
+        return (ILoginTokenStore) InjectionStore.get().get("login_token").orElseThrow(NullPointerException::new);
+    }
+
+    public LoginTokenStore(){
+        //DBにauth_flowテーブルがなければ作成するSQL文を実行する
+        db.controlSQL((con)-> {
+            try {
+                return Optional.of(Collections.singletonList(
+                        //テーブルがなかったら作る仕組み
+                        con.prepareStatement(
+                                //auth_flowテーブルを作る
+                                "CREATE TABLE IF NOT EXISTS login_token ("
+                                        //
+                                        +"uuid VARCHAR(256) PRIMARY KEY, "
+                                        //ログインするアカウントのID
+                                        +"account_id VARCHAR(256)"
+                                        +"expired_at VARCHAR(256)"+
+                                        ")")));
+            } catch (SQLException e) {
+                return Optional.empty();
+            }
+        });
     }
 
     /**
@@ -37,28 +52,52 @@ public class LoginTokenStore implements ILoginTokenStore {
      */
     @Override
     public Optional<String> getAccountUUID(String token) {
-        return store.getValue(PREFIX,token);
+        Optional<List<Map<String, String>>> sql = db.getLineBySQL(fieldName, (con) -> {
+            try {
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM login_token WHERE uuid = ?");
+                ps.setString(1, token);
+                return Optional.of(ps);
+            } catch (SQLException throwables) {}
+            return Optional.empty();
+        });
+        return sql.orElse(new ArrayList<>())
+                .stream()
+                .findFirst()
+                .filter(m->System.currentTimeMillis() > Long.parseLong(m.get("expired_at")))
+                .map(m->m.get("account_id"));
+
     }
 
     /**
-     * トークンの登録を確認する
-     * @param token アカウントに紐付けされたUUID
+     * トークンの存在を確認する
+     *
+     * @param token トークン
      * @return true->存在する false->存在しない
      */
     @Override
     public boolean containsToken(String token) {
-        return store.containsKey(PREFIX,token);
+        return getAccountUUID(token).isPresent();
     }
 
     /**
-     * トークンを登録する 一か月で削除される
+     * トークンを登録する
      *
-     * @param uuid  アカウントに紐付けされたUUID
      * @param token トークン
+     * @param uuid  アカウントに紐付けされたUUID
      */
     @Override
     public void putToken(String token, String uuid) {
-        store.putTimeValue(PREFIX,token,uuid,MONTH);
+        db.controlSQL((con)->{
+            try {
+                PreparedStatement ps = con.prepareStatement("INSERT INTO login_token VALUES (?,?) ;");
+                ps.setString(1,token);
+                ps.setString(2,uuid);
+                return Optional.of(Collections.singletonList(ps));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return Optional.empty();
+            }
+        });
     }
 
     /**
@@ -69,49 +108,35 @@ public class LoginTokenStore implements ILoginTokenStore {
      */
     @Override
     public boolean deleteTokenByAccount(String uuid) {
-        return store.delete(PREFIX,uuid);
+        return db.controlSQL((con)->{
+            try {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM login_token where account_id = ?");
+                ps.setString(1,uuid);
+                return Optional.of(Collections.singletonList(ps));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return Optional.empty();
+            }
+        });
     }
 
     /**
      * トークンを削除する
-     * @param token　ログイントークン
+     *
+     * @param token ログイントークン
      * @return true->成功 false->失敗
      */
     @Override
     public boolean deleteToken(String token) {
-        Optional<String> key = store.searchKey(PREFIX,token);
-        if (!key.isPresent()){
-            return false;
-        }else{
-            deleteTokenByAccount(key.get());
-            return true;
-        }
-    }
-
-    /**
-     * 登録されたアカウントのUUIDとトークンを返す
-     *
-     * @return List<Map < アカウントのUUID:String, トークン:String>>
-     */
-    @Override
-    public Map<String, String> getAllTokens() {
-        return store.getPairs(PREFIX);
-    }
-
-    /**
-     * アカウントに紐づけられたトークンを更新する
-     * @param token アカウントに紐付けされたUUID
-     * @return 更新後のトークン
-     */
-    @Override
-    public Optional<String> updateToken(String token) {
-        if(!containsToken(token)){
-            return Optional.empty();
-        }
-        Optional<String> uuid = getAccountUUID(token);
-        deleteToken(token);
-        String generatedUUID = UUID.randomUUID().toString();
-        putToken(generatedUUID,uuid.orElse(""));
-        return Optional.of(generatedUUID);
+        return db.controlSQL((con)->{
+            try {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM login_token where uuid = ?");
+                ps.setString(1,token);
+                return Optional.of(Collections.singletonList(ps));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return Optional.empty();
+            }
+        });
     }
 }
