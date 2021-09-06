@@ -9,7 +9,6 @@ import net.den3.IdP.Store.Auth.AccessTokenStore;
 import net.den3.IdP.Store.Auth.AuthFlowStore;
 import net.den3.IdP.Store.Auth.LoginTokenStore;
 import net.den3.IdP.Store.DBAccess;
-import net.den3.IdP.Store.InMemoryRedis;
 import net.den3.IdP.Store.InjectionStore;
 import net.den3.IdP.Store.Service.ServiceStore;
 import net.den3.IdP.Store.Upload.UploaderStore;
@@ -29,7 +28,6 @@ public class Server {
         InjectionStore store = InjectionStore.get();
         //マスターストア
         store.inject("rdbms",new DBAccess());
-        store.inject("memory_db",new InMemoryRedis());
 
         //スレーブストア
         store.inject("ppid",new PPIDStore());
