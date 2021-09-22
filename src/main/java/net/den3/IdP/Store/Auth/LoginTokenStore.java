@@ -1,19 +1,15 @@
 package net.den3.IdP.Store.Auth;
 
-import net.den3.IdP.Entity.Auth.AuthFlowBuilder;
-import net.den3.IdP.Entity.Auth.CodeChallengeMethod;
-import net.den3.IdP.Entity.Auth.IAuthFlow;
 import net.den3.IdP.Store.IDBAccess;
 import net.den3.IdP.Store.InjectionStore;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LoginTokenStore implements ILoginTokenStore{
 
-    private final Long DAY_UNIX_TIME = 24L*60L*60L;
+    private final Long DAY_UNIX_TIME = 24L*60L*60L*1000L;
 
     private final List<String> fieldName = Arrays.asList("uuid","account_id","expired_at");
 
@@ -32,10 +28,9 @@ public class LoginTokenStore implements ILoginTokenStore{
                         con.prepareStatement(
                                 //auth_flowテーブルを作る
                                 "CREATE TABLE IF NOT EXISTS login_token ("
-                                        //
                                         +"uuid VARCHAR(256) PRIMARY KEY, "
                                         //ログインするアカウントのID
-                                        +"account_id VARCHAR(256)"
+                                        +"account_id VARCHAR(256),"
                                         +"expired_at VARCHAR(256)"+
                                         ")")));
             } catch (SQLException e) {
@@ -63,7 +58,7 @@ public class LoginTokenStore implements ILoginTokenStore{
         return sql.orElse(new ArrayList<>())
                 .stream()
                 .findFirst()
-                .filter(m->System.currentTimeMillis() > Long.parseLong(m.get("expired_at")))
+                .filter(m-> System.currentTimeMillis() < Long.parseLong(m.get("expired_at")))
                 .map(m->m.get("account_id"));
 
     }
