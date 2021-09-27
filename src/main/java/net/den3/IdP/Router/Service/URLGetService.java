@@ -44,7 +44,6 @@ public class URLGetService {
                         .put("service_secret",service.get().getSecretID())
                         .put("redirect_uri", service.get().getRedirectURL())
                         .put("service_name", service.get().getServiceName())
-                        .put("redirect_url", service.get().getRedirectURL())
                         .put("icon_url", service.get().getServiceIconURL())
                         .put("description", service.get().getServiceDescription())
                         .put("permissions",permissions)
