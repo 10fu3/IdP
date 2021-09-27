@@ -11,17 +11,17 @@ services:
       - redis
     #必ず本番環境ではDBのパスワードは変更すること
     environment:
-      D3A_DBACCOUNT: ""
-      D3A_DBPASSWORD: ""
-      D3A_DB_URL: ""
-      D3A_REDIS_URL: ""
-      D3A_MINIMUM_PASS: ""
-      D3A_MAIL_ADDRESS: ""
-      D3A_MAIL_PASS: ""
-      D3A_SELF_URL: "http://localhost"
-      D3A_LOGIN_URL: "http://localhost/login"
-      D3A_UPLOADER_SECRET: ""
-      D3A_IDTOKEN_VALID_TIME_MINUTE: "5"
+      DBACCOUNT: ""
+      DBPASSWORD: ""
+      DB_URL: ""
+      REDIS_URL: ""
+      MINIMUM_PASS: ""
+      MAIL_ADDRESS: ""
+      MAIL_PASS: ""
+      SELF_URL: "http://localhost:3000"
+      LOGIN_URL: "http://localhost:3000/login"
+      UPLOADER_SECRET: ""
+      IDTOKEN_VALID_TIME_MINUTE: "5"
     command: java -jar target/IdP-1.0-all.jar
   db:
     image: mariadb:latest
@@ -34,7 +34,6 @@ services:
     command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
     volumes:
       - mariadb:/var/lib/mysql
-      - ./initdb
     ports:
       - "3306:3306"
   redis:
